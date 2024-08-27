@@ -1,6 +1,8 @@
 # TabMagic
 
-TabMagic is a companion tool designed to analyze and annotate guitar tablature, helping beginner to intermediate guitar players better understand the music they're playing.
+TabMagic is a companion web tool built using a React/Flask stack, designed to analyze and annotate guitar tablature, helping beginner to intermediate guitar players better understand the music they're playing.
+
+TabMagic's recoginition abilities are powered by PyTorch and a Faster R-CNN object detection backbone, fine-tuned on a custom annotated dataset of guitar tablature that can be found in this repo.
 
 ## Features
 
@@ -10,7 +12,7 @@ TabMagic is a companion tool designed to analyze and annotate guitar tablature, 
 - Suggests alternative ways to play
 - Supports standard 6-string guitar tabs
 
-## How It Works
+## How TabMagic Works
 
 1. Upload a PDF or PNG snapshot of your guitar tabs
 2. Let TabMagic process the information and provide detailed analysis!
@@ -62,7 +64,7 @@ To run and train the model, you'll need to set up a Python environment with the 
 
 To train and use the TabMagic model:
 
-1. Unzip the data.zip folder, and extract the contents to a `data/` directory in your project folder
+1. Unzip the data.zip folder, and extract the contents to a `data/` directory in your project folder.
 
 2. Ensure the following structure:
    ```
@@ -71,7 +73,7 @@ To train and use the TabMagic model:
    └── labels/
    ```
 
-3. Run the notebook `model.ipynb` to train the model (note that a CUDA enabled device is encouraged but not strictly required, as the model is device agnostic). This may take some time, be patient
+3. Run the notebook `model.ipynb` to train the model. The training may take some time, depending on your system and whether or not you have a CUDA enabled GPU.
 
 4. After training, the model will be saved in the `models` directory as `tabmagic_model.pth`.
 
@@ -83,3 +85,5 @@ To start both the React frontend and Flask backend concurrently:
 
 ```
 npm run start-dev
+
+You can now interact with TabMagic on your browser.
