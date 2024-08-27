@@ -1,0 +1,8 @@
+.upload-component-box {
+    border: 1px dashed gray;
+    border-radius: 4px;
+    padding: 16px;
+    margin-top: 10px;
+    text-align: center;
+    /*p-16 mt-10 border border-neutral-200*/
+}
