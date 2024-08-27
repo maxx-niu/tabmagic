@@ -84,6 +84,7 @@ To train and use the TabMagic model:
 To start both the React frontend and Flask backend concurrently:
 
 ```
-npm run start-dev
+npm run start-de
+```
 
 You can now interact with TabMagic on your browser.
