@@ -6,7 +6,7 @@ type TabDisplayProps = {
   }
 
 const TabDisplay: FC<TabDisplayProps> = ({processedImages}) => {
-    console.log(processedImages[0]);
+    console.log(processedImages);
     return (
         <div>
             {processedImages.map((image, index) => (
