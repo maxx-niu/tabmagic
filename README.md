@@ -1,6 +1,6 @@
 # TabMagic
 
-TabMagic is a companion web tool built using a React/Flask stack, designed to analyze and annotate guitar tablature to better help beginner to intermediate guitar players better understand the music they're playing.
+TabMagic is a companion web tool built using a React/Flask stack, designed to analyze and annotate guitar tablature to help beginner to intermediate guitar players better understand the music they're playing.
 
 TabMagic's recoginition abilities are powered by PyTorch and a Faster R-CNN object detection backbone, fine-tuned on a custom annotated dataset of guitar tablature that can be found in this repo.
 
