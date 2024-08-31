@@ -9,7 +9,8 @@ from flask_cors import CORS
 from pdf2image import convert_from_path
 import os
 from PIL import Image
-from getTabBboxes import load_model, compute_bounding_boxes
+from getTabBboxes import load_model, compute_bounding_boxes, save_bar_bb_to_image
+from serverutils import clear_directory
 
 app = Flask(__name__) # this rferences this server.py file
 cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}) # makes it so that server accepts all requests
@@ -28,13 +29,7 @@ def upload_file():
     file_extension = os.path.splitext(filename)[1].lower()
 
     # Clear the image folder before saving new files
-    for fname in os.listdir(IMAGE_FOLDER):
-        file_path = os.path.join(IMAGE_FOLDER, fname)
-        try:
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-        except Exception as e:
-            print(f"Error deleting {file_path}: {e}")
+    clear_directory(IMAGE_FOLDER)
 
     if file_extension == '.pdf':
         
@@ -49,13 +44,7 @@ def upload_file():
             image.save(image_path, 'PNG')
             image_paths.append(image_path)
         # Clear the temp folder after processing
-        for temp_file in os.listdir(TEMP_UPLOAD_FOLDER):
-            file_path = os.path.join(TEMP_UPLOAD_FOLDER, temp_file)
-            try:
-                if os.path.isfile(file_path):
-                    os.unlink(file_path)
-            except Exception as e:
-                print(f"Error deleting {file_path}: {e}")
+        clear_directory(TEMP_UPLOAD_FOLDER)
 
     elif file_extension in ['.png', '.jpg', '.jpeg']:
         print("uploaded file was an image")
@@ -73,21 +62,19 @@ def upload_file():
 def get_image(filename):
     return send_from_directory(IMAGE_FOLDER, filename)
 
-"""
-NOTE TO SELF: not sure if you need to pre-process the image before uploading it. TODO LATER
-EDIT (08/26/2024): I do ineed need to do this LOL
-"""
 
 @app.route('/process', methods=['POST'])
 def predict():
     model = load_model('models/tabmagic_model.pth')  # Make sure to replace with your actual model path
     results = []
+    #clear_directory("tab_boxes")
 
     for image_path in os.listdir(IMAGE_FOLDER):
         if image_path.lower().endswith(('.png', '.jpg', '.jpeg')):
             full_path = os.path.join(IMAGE_FOLDER, image_path)
             image = Image.open(full_path)
             bounding_boxes = compute_bounding_boxes(model, image)
+            save_bar_bb_to_image(bounding_boxes, full_path)
             results.append({
                 'image_path': f'/images/{image_path}',
                 'bounding_boxes': bounding_boxes

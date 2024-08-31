@@ -1,7 +1,7 @@
+import os
 import torch
 from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from torchvision.transforms import ToTensor, Compose
 from torchvision.ops import nms
 from PIL import Image
 from torchvision import transforms
@@ -58,3 +58,48 @@ def compute_bounding_boxes(model, image, confidence_threshold=0.5, iou_threshold
     
     result = [{'box': box.tolist(), 'score': float(score)} for box, score in zip(boxes, scores)]
     return result
+
+
+def save_bar_bb_to_image(bbs, image_path, save_dir="tab_boxes", confidence_threshold=0.5, iou_threshold=0.5):
+    """
+    Given the bar bounding boxes of a tablature page, extract them and save them as images.
+    """
+    total_bars = len(bbs)
+    image = Image.open(image_path)
+    image_name = os.path.splitext(os.path.basename(image_path))[0]
+
+    os.makedirs(save_dir, exist_ok=True)
+    for i, bb in enumerate(bbs):
+        # Extract coordinates
+        x1, y1, x2, y2 = map(int, bb['box'])
+        
+        # Crop the image
+        cropped_bar = image.crop((x1, y1, x2, y2))
+        
+        # Generate a filename for the cropped image
+        filename = f"{image_name}_bar_{i+1}_of_{total_bars}.png"
+        filepath = os.path.join(save_dir, filename)
+        
+        # Save the cropped image
+        cropped_bar.save(filepath)
+
+def sort_bar_bounding_boxes(bbs):
+    """
+    Sorts the extracted bar bounding boxes of a tablature page from left->right, top->bottom
+    """
+    def box_overlap(box1, box2):
+        # vertically overlapping boxes are of the same row
+        return max(0, min(box1[3], box2[3]) - max(box1[1], box2[1])) > 0
+    
+    sorted_boxes = []
+    remaining_boxes = list(range(len(bbs)))
+    while remaining_boxes:
+        current_row = [remaining_boxes[0]]
+        for i in remaining_boxes[1:]:
+            if any(box_overlap(bbs[i], bbs[j]) for j in current_row):
+                current_row.append(i)
+        current_row.sort(key=lambda i: bbs[i][0])  # Sort current row left to right
+        sorted_boxes.extend(current_row)
+        remaining_boxes = [i for i in remaining_boxes if i not in current_row]
+
+    return sorted_boxes
