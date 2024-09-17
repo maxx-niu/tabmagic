@@ -1,3 +1,4 @@
+from itertools import chain
 import os
 from typing import List
 import torch
@@ -61,41 +62,43 @@ def compute_bounding_boxes(model, image, confidence_threshold=0.5, iou_threshold
     return result
 
 
-def save_bar_bb_to_image(bbs, image_path, save_dir="tab_boxes", confidence_threshold=0.5, iou_threshold=0.5):
+def save_bar_bb_to_image(bbs: List[List[dict]], image_path, save_dir="tab_boxes", confidence_threshold=0.5, iou_threshold=0.5):
     """
     Given the bar bounding boxes of a tablature page, extract them and save them as images.
     """
-    total_bars = len(bbs)
     image = Image.open(image_path)
     image_name = os.path.splitext(os.path.basename(image_path))[0]
 
     os.makedirs(save_dir, exist_ok=True)
-    for i, bb in enumerate(bbs):
-        # Extract coordinates
-        x1, y1, x2, y2 = map(int, bb['box'])
-        
-        # Crop the image
-        cropped_bar = image.crop((x1, y1, x2, y2))
-        
-        # Generate a filename for the cropped image
-        filename = f"{image_name}_bar_{i+1}_of_{total_bars}.png"
-        filepath = os.path.join(save_dir, filename)
-        
-        # Save the cropped image
-        cropped_bar.save(filepath)
+    i = 0
+    for row in bbs:
+        print(len(row))
+        for bb in row:
+            i += 1
+            # Extract coordinates
+            x1, y1, x2, y2 = map(int, bb['box'])
+            
+            # Crop the image
+            cropped_bar = image.crop((x1, y1, x2, y2))
+            
+            # Generate a filename for the cropped image
+            filename = f"{image_name}_bar_{i}.png"
+            filepath = os.path.join(save_dir, filename)
+            
+            # Save the cropped image
+            cropped_bar.save(filepath)
 
 def sort_bar_bounding_boxes(bbs: List[dict]): # bbs are in [x1, y1, x2, y2] format
     """
     Sorts the extracted bar bounding boxes of a tablature page from left->right, top->bottom
     """
-    bbs_sorted = sorted(bbs, key=lambda box: (box["box"][1], box["box"][0]))
+    bbs_sorted = sorted(bbs, key=lambda box: box["box"][1])
     def box_overlap(box1, box2):
         # vertically overlapping boxes are of the same row
         return max(0, min(box1[3], box2[3]) - max(box1[1], box2[1])) > 0
     
     rows = []
 
-    print(bbs)
     for box in bbs_sorted:
         placed_in_row = False
 
@@ -106,4 +109,6 @@ def sort_bar_bounding_boxes(bbs: List[dict]): # bbs are in [x1, y1, x2, y2] form
                 break
         if not placed_in_row:
             rows.append([box])
+    for row in rows:
+        row.sort(key=lambda box: box["box"][0])
     return rows

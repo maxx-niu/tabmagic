@@ -62,6 +62,9 @@ def upload_file():
 def get_image(filename):
     return send_from_directory(IMAGE_FOLDER, filename)
 
+@app.route('/tab_boxes/<filename>')
+def get_tab_box(filename):
+    return send_from_directory('tab_boxes', filename)
 
 @app.route('/process', methods=['POST'])
 def predict():
@@ -77,10 +80,11 @@ def predict():
             bounding_boxes = compute_bounding_boxes(model, image)
             bbs_row = sort_bar_bounding_boxes(bounding_boxes)
             sort_bar_bounding_boxes(bounding_boxes)
-            save_bar_bb_to_image(bounding_boxes, full_path) # the bounding boxes for each bar should be sorted first
+            save_bar_bb_to_image(bbs_row, full_path) # the bounding boxes for each bar should be sorted first
             results.append({
                 'image_path': f'/images/{image_path}',
-                'bounding_boxes': bbs_row
+                'bounding_boxes': bbs_row,
+                'image_name': image_path
             })
 
     return jsonify(results)
