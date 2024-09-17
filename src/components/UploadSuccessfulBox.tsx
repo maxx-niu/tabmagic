@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { UploadSuccessfulBoxProps } from '../types';
+import { log } from 'console';
 
 const UploadSuccessfulBox: FC<UploadSuccessfulBoxProps> = ({isOpen, onCancel, setProcessedImages}) => {
   if(!isOpen) return null;

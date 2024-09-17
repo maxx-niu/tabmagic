@@ -8,10 +8,10 @@ export type UploadErrorBoxProps = {
 };
 
 export type ProcessedImage = {
-    bounding_boxes: Array<{
-        coordinates: number[],
-        score: number
-    }>;
+    bounding_boxes: Array<Array<{
+        score: number;
+        box: number[];
+    }>>;
     image_path: string;
 };
 

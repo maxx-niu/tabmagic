@@ -9,7 +9,7 @@ from flask_cors import CORS
 from pdf2image import convert_from_path
 import os
 from PIL import Image
-from getTabBboxes import load_model, compute_bounding_boxes, save_bar_bb_to_image
+from getTabBboxes import load_model, compute_bounding_boxes, save_bar_bb_to_image, sort_bar_bounding_boxes
 from serverutils import clear_directory
 
 app = Flask(__name__) # this rferences this server.py file
@@ -65,19 +65,22 @@ def get_image(filename):
 
 @app.route('/process', methods=['POST'])
 def predict():
+    print("hello")
     model = load_model('models/tabmagic_model.pth')  # Make sure to replace with your actual model path
     results = []
-    #clear_directory("tab_boxes")
+    clear_directory("tab_boxes")
 
     for image_path in os.listdir(IMAGE_FOLDER):
         if image_path.lower().endswith(('.png', '.jpg', '.jpeg')):
             full_path = os.path.join(IMAGE_FOLDER, image_path)
             image = Image.open(full_path)
             bounding_boxes = compute_bounding_boxes(model, image)
-            save_bar_bb_to_image(bounding_boxes, full_path)
+            bbs_row = sort_bar_bounding_boxes(bounding_boxes)
+            sort_bar_bounding_boxes(bounding_boxes)
+            save_bar_bb_to_image(bounding_boxes, full_path) # the bounding boxes for each bar should be sorted first
             results.append({
                 'image_path': f'/images/{image_path}',
-                'bounding_boxes': bounding_boxes
+                'bounding_boxes': bbs_row
             })
 
     return jsonify(results)

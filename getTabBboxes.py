@@ -1,4 +1,5 @@
 import os
+from typing import List
 import torch
 from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
@@ -83,23 +84,26 @@ def save_bar_bb_to_image(bbs, image_path, save_dir="tab_boxes", confidence_thres
         # Save the cropped image
         cropped_bar.save(filepath)
 
-def sort_bar_bounding_boxes(bbs):
+def sort_bar_bounding_boxes(bbs: List[dict]): # bbs are in [x1, y1, x2, y2] format
     """
     Sorts the extracted bar bounding boxes of a tablature page from left->right, top->bottom
     """
+    bbs_sorted = sorted(bbs, key=lambda box: (box["box"][1], box["box"][0]))
     def box_overlap(box1, box2):
         # vertically overlapping boxes are of the same row
         return max(0, min(box1[3], box2[3]) - max(box1[1], box2[1])) > 0
     
-    sorted_boxes = []
-    remaining_boxes = list(range(len(bbs)))
-    while remaining_boxes:
-        current_row = [remaining_boxes[0]]
-        for i in remaining_boxes[1:]:
-            if any(box_overlap(bbs[i], bbs[j]) for j in current_row):
-                current_row.append(i)
-        current_row.sort(key=lambda i: bbs[i][0])  # Sort current row left to right
-        sorted_boxes.extend(current_row)
-        remaining_boxes = [i for i in remaining_boxes if i not in current_row]
+    rows = []
 
-    return sorted_boxes
+    print(bbs)
+    for box in bbs_sorted:
+        placed_in_row = False
+
+        for row in rows:
+            if any(box_overlap(box["box"], other_box["box"]) for other_box in row):
+                row.append(box)
+                placed_in_row = True
+                break
+        if not placed_in_row:
+            rows.append([box])
+    return rows

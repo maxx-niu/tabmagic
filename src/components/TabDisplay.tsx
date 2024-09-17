@@ -3,20 +3,35 @@ import { ProcessedImage } from '../types';
 
 type TabDisplayProps = {
     processedImages: ProcessedImage[];
-  }
+}
 
 const TabDisplay: FC<TabDisplayProps> = ({processedImages}) => {
-    console.log(processedImages);
+    // for (const processedImage of processedImages){
+    //     console.log(processedImage)
+    // }
+
     return (
         <div>
-            {processedImages.map((image, index) => (
-                <div key={index}>
+            {processedImages.map((processedImage, imgIdx) => (
+                <div key={imgIdx}>
                     <img 
-                        src={`http://localhost:5000${image.image_path}`}
+                        src={`http://localhost:5000${processedImage.image_path}`}
                         alt='churg'
                         style={{ maxWidth: '100%', height: 'auto', marginBottom: '20px' }}
                     />
-                    <p>Bounding Boxes:</p>
+                    {processedImage.bounding_boxes.flat().map((box, boxIdx) => (
+                        <div key={boxIdx} style={{ marginBottom: '10px' }}>
+                            <img 
+                                src={`http://localhost:5000${processedImage.image_path}`}
+                                alt={`Bar ${boxIdx + 1}`}
+                                style={{
+                                    clipPath: `polygon(${box['box'][0]}px ${box['box'][1]}px, ${box['box'][2]}px ${box['box'][1]}px,
+                                    ${box['box'][2]}px ${box['box'][3]}px, ${box['box'][0]}px ${box['box'][3]}px)`,
+                                    maxWidth: `${box['box'][2] - box['box'][0]}`,
+                                }}
+                            />
+                        </div>
+                    ))}
                 </div>
             ))}
         </div>
