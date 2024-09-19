@@ -2,8 +2,8 @@ import { useCallback, useState, FC } from 'react';
 import { FileRejection, useDropzone } from 'react-dropzone';
 import '../styles/UploadComponent.css';
 import UploadErrorBox from './UploadErrorBox';
-import UploadSuccessfulBox from './UploadSuccessfulBox';
 import TabDisplay from './TabDisplay';
+import Preview from './Preview';
 import { ProcessedImage } from '../types';
 
 const UploadComponent: FC = () => {
@@ -13,9 +13,7 @@ const UploadComponent: FC = () => {
     code: string,
     message: string
   }>({code: '', message: ''});
-  const [showUploadSuccessful, setshowUploadSuccessful] = useState(false);
   const [processedImages, setProcessedImages] = useState<ProcessedImage[]>([]);
-  
 
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
     if(rejectedFiles.length === 0){
@@ -56,53 +54,55 @@ const UploadComponent: FC = () => {
       if (!response.ok) {
         throw new Error('File upload failed');
       }
-      setshowUploadSuccessful(true);
     } catch (error) {
       setShowUploadErrorBox(true);
       setUploadError({ code: 'upload-failed', message: error instanceof Error ? error.message : 'An unknown error occurred' });
+    }
+    try {
+      const response = await fetch('http://localhost:5000/process', {
+        method: 'POST'
+      });
+
+      if (!response.ok) {
+        throw new Error('File upload failed');
+      }
+      const processedData = await response.json();
+      setProcessedImages(processedData);
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
 
   return (
     <>
-      <form>
-        <div {...getRootProps(
-          {className: 'upload-component-box'}
-        )}>
-          <input {...getInputProps()} />
-          {
-            isDragActive ? // triggers if user drags something over the drop-zone
-              <p>Drop PDF tabs or tab images here</p> :
-              <p>Click to add or drag PDF/image tabs</p>
-          }
-        </div>
-        {
-          file && (
-            <div>
-              <h4>Your selected file (preview): </h4>
-              <h5>{file.name}</h5>
-              <button type="button" onClick={handleUpload}>Upload</button>
+      <div className='upload-component'>
+        { processedImages.length === 0 &&
+          <form>
+            <div {...getRootProps(
+              {className: 'upload-component-box'}
+              )}>
+              <input {...getInputProps()} />
+              {
+                isDragActive ? // triggers if user drags something over the drop-zone
+                  <p>Drop PDF tabs or tab images here</p> :
+                  <p>Click to add or drag PDF/image tabs here</p>
+              }
             </div>
-          )
+          </form>
         }
-      </form>
-      <UploadErrorBox
-        isOpen={showUploadErrorBox}
-        error={uploadError}
-        onClose={() => {
-          setShowUploadErrorBox(false);
-          setUploadError({code: '', message: ''});
-        }}
-      />
-      <UploadSuccessfulBox
-        isOpen={showUploadSuccessful}
-        onCancel={() => {
-          setshowUploadSuccessful(false);
-          setProcessedImages([]);
-        }}
-        setProcessedImages={setProcessedImages}
-      />
-      {processedImages.length > 0 && <TabDisplay processedImages={processedImages}/>}
+        {
+          file && processedImages.length < 0 && <Preview file={file} onConfirm={handleUpload} onDeny={() => {}}/>
+        }
+        <UploadErrorBox
+          isOpen={showUploadErrorBox}
+          error={uploadError}
+          onClose={() => {
+            setShowUploadErrorBox(false);
+            setUploadError({code: '', message: ''});
+          }}
+        />
+        {processedImages.length > 0 && <TabDisplay processedImages={processedImages}/>}
+      </div>
     </>
   )
 }

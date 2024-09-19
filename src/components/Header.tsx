@@ -6,10 +6,20 @@ const Header: FC = () => {
   return (
     <header>
         <div className='header-content'>
-            <h1>TabMagic</h1>
+            <Link to="/" className="home-nav">
+              <h1>TabMagic</h1>
+            </Link>
             <nav>
                 <ul className="nav-links">
-                    <li><Link to="/about">What is it?</Link></li>
+                    <li>
+                      <Link to="/overview" className="nav-link">What is it?</Link>
+                    </li>
+                    <li>
+                      <Link to="/how-it-works" className="nav-link">How it Works</Link>
+                    </li>
+                    <li>
+                      <Link to="/about" className="nav-link">About the Developer</Link>
+                    </li>
                 </ul>
             </nav>
         </div>

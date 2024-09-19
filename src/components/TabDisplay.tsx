@@ -10,11 +10,11 @@ const TabDisplay: FC<TabDisplayProps> = ({processedImages}) => {
     return (
         <div>
             {processedImages.map((processedImage, imgIdx) => {
-                console.log(processedImage.image_path);
+                // console.log(processedImage.image_path);
                 return (<div key={imgIdx}>
                     <img 
                         src={`http://localhost:5000${processedImage.image_path}`}
-                        alt='churg'
+                        alt='Tab Page Preview'
                         style={{ maxWidth: '100%', height: 'auto', marginBottom: '20px' }}
                     />
                     {processedImage.bounding_boxes.flat().map((box, boxIdx) => {
@@ -29,6 +29,8 @@ const TabDisplay: FC<TabDisplayProps> = ({processedImages}) => {
                     })}
                 </div>)
             })}
+            {/* TODO: finish this functionality */}
+            <button>Upload More Tabs</button>
         </div>
     );
 };

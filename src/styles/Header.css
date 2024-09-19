@@ -1,15 +1,27 @@
 .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1D3961;
+  width: 100%;
+}
   
-  .nav-links {
-    display: flex;
-    list-style-type: none;
-    padding: 0;
-  }
+.nav-links {
+  display: flex;
+  list-style-type: none;
+  padding: 0;
+}
   
-  .nav-links li {
-    margin-right: 20px;
-  }
+.nav-links li{
+  margin-right: 20px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+}
+
+.home-nav {
+  color: white;
+  text-decoration: none;
+}

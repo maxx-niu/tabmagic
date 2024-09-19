@@ -6,3 +6,8 @@
     text-align: center;
     /*p-16 mt-10 border border-neutral-200*/
 }
+
+.upload-component {
+    padding-left: 8px;
+    padding-right: 8px;
+}
