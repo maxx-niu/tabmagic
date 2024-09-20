@@ -5,6 +5,7 @@ import UploadErrorBox from './UploadErrorBox';
 import TabDisplay from './TabDisplay';
 import Preview from './Preview';
 import { ProcessedImage } from '../types';
+import LoadingBars from './LoadingBars';
 
 const UploadComponent: FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -14,11 +15,14 @@ const UploadComponent: FC = () => {
     message: string
   }>({code: '', message: ''});
   const [processedImages, setProcessedImages] = useState<ProcessedImage[]>([]);
+  const [showPreview, setShowPreview] = useState<boolean>(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
     if(rejectedFiles.length === 0){
       // do something with the accepted files
       setFile(acceptedFiles[0]);
+      setShowPreview(true);
     } else {
       // do something with rejected files
       if(rejectedFiles.length > 1){
@@ -30,7 +34,7 @@ const UploadComponent: FC = () => {
         setUploadError(rejectedFiles[0]['errors'][0]);
       }
     }
-  }, []); // useCallback used to prevent useDropzone from doing more work if UploadComponent re-renders
+  }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -44,6 +48,8 @@ const UploadComponent: FC = () => {
 
     const formData = new FormData();
     formData.append('file', file);
+
+    setIsProcessing(true);
 
     try {
       const response = await fetch('http://localhost:5000/upload', {
@@ -68,16 +74,19 @@ const UploadComponent: FC = () => {
       }
       const processedData = await response.json();
       setProcessedImages(processedData);
+      setShowPreview(false);
     } catch (error) {
       console.error('Error:', error);
+    } finally {
+      setIsProcessing(false);  // End processing regardless of outcome
     }
   };
 
   return (
     <>
       <div className='upload-component'>
-        { processedImages.length === 0 &&
-          <form>
+        { processedImages.length === 0 && !file &&
+          <form className='upload-component-form'>
             <div {...getRootProps(
               {className: 'upload-component-box'}
               )}>
@@ -91,7 +100,10 @@ const UploadComponent: FC = () => {
           </form>
         }
         {
-          file && processedImages.length < 0 && <Preview file={file} onConfirm={handleUpload} onDeny={() => {}}/>
+          file && showPreview && !isProcessing && <Preview file={file} onConfirm={handleUpload} onDeny={() => {
+            setFile(null)
+            setShowPreview(false)
+          }}/>
         }
         <UploadErrorBox
           isOpen={showUploadErrorBox}
@@ -101,7 +113,15 @@ const UploadComponent: FC = () => {
             setUploadError({code: '', message: ''});
           }}
         />
-        {processedImages.length > 0 && <TabDisplay processedImages={processedImages}/>}
+        {isProcessing ? (
+          <LoadingBars />
+        ) : (
+          processedImages.length > 0 && <TabDisplay processedImages={processedImages} onUploadAgain={() => {
+            setProcessedImages([])
+            setFile(null)
+            setShowPreview(false)
+          }}/>
+        )}
       </div>
     </>
   )

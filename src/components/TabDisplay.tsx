@@ -4,9 +4,10 @@ import { log } from 'console';
 
 type TabDisplayProps = {
     processedImages: ProcessedImage[];
+    onUploadAgain: () => void;
 }
 
-const TabDisplay: FC<TabDisplayProps> = ({processedImages}) => {
+const TabDisplay: FC<TabDisplayProps> = ({processedImages, onUploadAgain}) => {
     return (
         <div>
             {processedImages.map((processedImage, imgIdx) => {
@@ -29,8 +30,7 @@ const TabDisplay: FC<TabDisplayProps> = ({processedImages}) => {
                     })}
                 </div>)
             })}
-            {/* TODO: finish this functionality */}
-            <button>Upload More Tabs</button>
+            <button onClick={onUploadAgain}>Upload another tab</button>
         </div>
     );
 };

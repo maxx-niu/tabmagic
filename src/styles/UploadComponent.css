@@ -2,7 +2,6 @@
     border: 1px dashed gray;
     border-radius: 4px;
     padding: 16px;
-    margin-top: 10px;
     text-align: center;
     /*p-16 mt-10 border border-neutral-200*/
 }
@@ -10,4 +9,8 @@
 .upload-component {
     padding-left: 8px;
     padding-right: 8px;
+}
+
+.upload-component-form {
+    padding-top: 10px;
 }
