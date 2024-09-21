@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 import { ProcessedImage } from '../types';
-import { log } from 'console';
 
 type TabDisplayProps = {
     processedImages: ProcessedImage[];

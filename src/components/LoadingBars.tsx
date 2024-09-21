@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import { FC } from 'react'
 import '../styles/LoadingBars.css'
 
 type LoadingBarsProps = {
@@ -6,7 +6,7 @@ type LoadingBarsProps = {
 }
 
 const LoadingBars: FC<LoadingBarsProps> = ({animationDuration = 0.4}) => {
-  const [showLoading, setmShowLoading] = useState<Boolean>(false);
+  // const [showLoading, setmShowLoading] = useState<Boolean>(false);
   return (
     <>
       <div className="loading-bar-container">
