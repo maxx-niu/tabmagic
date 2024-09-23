@@ -23,7 +23,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "start-flask": "python server.py",
+    "start-flask": "python ./server/server.py",
     "start-dev": "concurrently \"npm run start\" \"npm run start-flask\""
   },
   "eslintConfig": {

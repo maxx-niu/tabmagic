@@ -15,8 +15,8 @@ from serverutils import clear_directory
 app = Flask(__name__) # this rferences this server.py file
 cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}) # makes it so that server accepts all requests
 
-TEMP_UPLOAD_FOLDER = 'temp_uploads'
-IMAGE_FOLDER = 'images'
+TEMP_UPLOAD_FOLDER = './temp_uploads'
+IMAGE_FOLDER = './images'
 os.makedirs(TEMP_UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(IMAGE_FOLDER, exist_ok=True)
 
@@ -60,18 +60,18 @@ def upload_file():
 
 @app.route('/images/<filename>')
 def get_image(filename):
-    return send_from_directory(IMAGE_FOLDER, filename)
+    return send_from_directory('../images', filename)
 
 @app.route('/tab_boxes/<filename>')
 def get_tab_box(filename):
-    return send_from_directory('tab_boxes', filename)
+    return send_from_directory('../tab_boxes', filename)
 
 @app.route('/process', methods=['POST'])
 def predict():
     print("hello")
-    model = load_model('models/tabmagic_model.pth')  # Make sure to replace with your actual model path
+    model = load_model('./models/tabmagic_model.pth')  # Make sure to replace with your actual model path
     results = []
-    clear_directory("tab_boxes")
+    clear_directory("./tab_boxes")
 
     for image_path in os.listdir(IMAGE_FOLDER):
         if image_path.lower().endswith(('.png', '.jpg', '.jpeg')):
@@ -88,6 +88,12 @@ def predict():
             })
 
     return jsonify(results)
+
+@app.route('/get_frets')
+def get_frets():
+    model = load_model('./models/number_model.pth')
+    results = []
+    # right now, we have the images of the tab,   
 
 # mini flask tutorial:
 # @app.route("/members") # setup URL endpoints with the @app.route() decorator

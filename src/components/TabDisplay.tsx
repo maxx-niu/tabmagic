@@ -10,7 +10,7 @@ const TabDisplay: FC<TabDisplayProps> = ({processedImages, onUploadAgain}) => {
     return (
         <div>
             {processedImages.map((processedImage, imgIdx) => {
-                // console.log(processedImage.image_path);
+                console.log(processedImage);
                 return (<div key={imgIdx}>
                     <img 
                         src={`http://localhost:5000${processedImage.image_path}`}
