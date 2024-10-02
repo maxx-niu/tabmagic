@@ -11,6 +11,8 @@ export type ProcessedImage = {
     bounding_boxes: Array<Array<{
         score: number;
         box: number[];
+        label: string;
+        filename: string;
     }>>;
     image_path: string;
     image_name: string

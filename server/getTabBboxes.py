@@ -10,9 +10,8 @@ from torchvision import transforms
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def load_model(model_path):
+def load_model(model_path, num_classes=2):
     model = fasterrcnn_resnet50_fpn_v2(pretrained=False)
-    num_classes = 2
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
     model.load_state_dict(torch.load(model_path, map_location=device))
@@ -20,13 +19,13 @@ def load_model(model_path):
     model.eval()
     return model
 
-def compute_bounding_boxes(model, image, confidence_threshold=0.5, iou_threshold=0.5):
+def compute_bounding_boxes(model, image, confidence_threshold=0.5, iou_threshold=0.5, height=1024, width=1024, label_map=None):
     original_width, original_height = image.size
     if image.mode != 'RGB':
         image = image.convert('RGB')
     # Define the same transform as used in training
     transform = transforms.Compose([
-        transforms.Resize((1024, 1024)),
+        transforms.Resize((height, width)),
         transforms.ToTensor()
     ])
     
@@ -38,18 +37,22 @@ def compute_bounding_boxes(model, image, confidence_threshold=0.5, iou_threshold
     with torch.no_grad():
         prediction = model(image_tensor)[0]
     
+    #print(prediction)
     boxes = prediction['boxes'].cpu()
     scores = prediction['scores'].cpu()
+    labels = prediction['labels'].cpu()
     
     # apply confidence threshold
     mask = scores > confidence_threshold
     boxes = boxes[mask]
     scores = scores[mask]
+    labels = labels[mask]
     
     # Apply NMS
     keep = nms(boxes, scores, iou_threshold)
     boxes = boxes[keep].numpy()
     scores = scores[keep].numpy()
+    labels = labels[keep].numpy()
 
     # apply inverse scaling to get the bounding boxes relative to the original image
     scale_x = original_width / 1024
@@ -57,8 +60,11 @@ def compute_bounding_boxes(model, image, confidence_threshold=0.5, iou_threshold
     
     boxes[:, [0, 2]] *= scale_x
     boxes[:, [1, 3]] *= scale_y
+
+    if label_map:
+        labels = [label_map.get(label, label) for label in labels]
     
-    result = [{'box': box.tolist(), 'score': float(score)} for box, score in zip(boxes, scores)]
+    result = [{'box': box.tolist(), 'score': float(score), 'label': label} for box, score, label in zip(boxes, scores, labels)]
     return result
 
 
@@ -72,7 +78,7 @@ def save_bar_bb_to_image(bbs: List[List[dict]], image_path, save_dir="tab_boxes"
     os.makedirs(save_dir, exist_ok=True)
     i = 0
     for row in bbs:
-        print(len(row))
+        # print(len(row))
         for bb in row:
             i += 1
             # Extract coordinates
@@ -83,6 +89,7 @@ def save_bar_bb_to_image(bbs: List[List[dict]], image_path, save_dir="tab_boxes"
             
             # Generate a filename for the cropped image
             filename = f"{image_name}_bar_{i}.png"
+            bb['filename'] = filename
             filepath = os.path.join(save_dir, filename)
             
             # Save the cropped image
