@@ -32,7 +32,7 @@ def compute_bounding_boxes(model, image, confidence_threshold=0.5, iou_threshold
     # Apply the transform to the input image
     image_tensor = transform(image).unsqueeze(0).to(device)
 
-    print(f"Image tensor shape: {image_tensor.shape}")
+    # print(f"Image tensor shape: {image_tensor.shape}")
     
     with torch.no_grad():
         prediction = model(image_tensor)[0]
@@ -55,8 +55,8 @@ def compute_bounding_boxes(model, image, confidence_threshold=0.5, iou_threshold
     labels = labels[keep].numpy()
 
     # apply inverse scaling to get the bounding boxes relative to the original image
-    scale_x = original_width / 1024
-    scale_y = original_height / 1024
+    scale_x = original_width / width
+    scale_y = original_height / height
     
     boxes[:, [0, 2]] *= scale_x
     boxes[:, [1, 3]] *= scale_y
@@ -68,7 +68,7 @@ def compute_bounding_boxes(model, image, confidence_threshold=0.5, iou_threshold
     return result
 
 
-def save_bar_bb_to_image(bbs: List[List[dict]], image_path, save_dir="tab_boxes", confidence_threshold=0.5, iou_threshold=0.5):
+def save_bar_bb_to_image(bbs: List[List[dict]], image_path, save_dir="tab_boxes", confidence_threshold=0.5, iou_threshold=0.5, u=0, d=0, l=0, r=0):
     """
     Given the bar bounding boxes of a tablature page, extract them and save them as images.
     """
@@ -85,7 +85,7 @@ def save_bar_bb_to_image(bbs: List[List[dict]], image_path, save_dir="tab_boxes"
             x1, y1, x2, y2 = map(int, bb['box'])
             
             # Crop the image
-            cropped_bar = image.crop((x1, y1, x2, y2))
+            cropped_bar = image.crop((x1 - l, y1 - u, x2 + r, y2 + d))
             
             # Generate a filename for the cropped image
             filename = f"{image_name}_bar_{i}.png"

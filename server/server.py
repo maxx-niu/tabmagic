@@ -75,7 +75,7 @@ def predict():
         image = Image.open(full_path)
         bounding_boxes = compute_bounding_boxes(model, image, label_map={1: "bar"})
         bbs_sorted = sort_bar_bounding_boxes(bounding_boxes)
-        save_bar_bb_to_image(bbs_sorted, full_path) # save the images of the bars to the tab_boxes dir
+        save_bar_bb_to_image(bbs_sorted, full_path, u=5, d=5) # save the images of the bars to the tab_boxes dir
         res = {
             'image_path': f'/images/{image_path}',
             'bounding_boxes': bbs_sorted,
@@ -92,28 +92,13 @@ def predict():
                 string_fret_bounding_boxes = compute_bounding_boxes(bar_model, bar_image, width=512, height=256, label_map={
                     1: "string",
                     2: "number"
-                })
-                print("here ya go:\n",string_fret_bounding_boxes)
+                }, confidence_threshold=0.9, iou_threshold=0.95)
+                bb['fret_strings'] = string_fret_bounding_boxes
 
         results.append(res)
              
     #get_frets()
     return jsonify(results)
-
-# @app.route('/get_frets')
-def get_frets():
-    # first, identify the strings and fret numbers
-    bar_model = load_model('./models/tabmagic_model_bars.pth', num_classes=3)
-    #fret_num_model = load_model('./models/number_model.pth')  # Load the fret number model
-    bar_results = []
-    for image in os.listdir('./tab_boxes'):
-        full_path = os.path.join('./tab_boxes', image)
-        image = Image.open(full_path)
-        bounding_boxes = compute_bounding_boxes(bar_model, image, width=512, height=256)
-        bar_results.append(bounding_boxes)
-
-    print("hello\n")    
-    print(bar_results)
 
 # mini flask tutorial:
 # @app.route("/members") # setup URL endpoints with the @app.route() decorator

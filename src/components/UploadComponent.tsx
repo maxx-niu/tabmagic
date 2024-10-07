@@ -4,7 +4,7 @@ import '../styles/UploadComponent.css';
 import UploadErrorBox from './UploadErrorBox';
 import TabDisplay from './TabDisplay';
 import Preview from './Preview';
-import { ProcessedImage } from '../types';
+import { tabImage } from '../types';
 import LoadingBars from './LoadingBars';
 
 const UploadComponent: FC = () => {
@@ -14,7 +14,7 @@ const UploadComponent: FC = () => {
     code: string,
     message: string
   }>({code: '', message: ''});
-  const [processedImages, setProcessedImages] = useState<ProcessedImage[]>([]);
+  const [processedImages, setProcessedImages] = useState<tabImage[]>([]);
   const [showPreview, setShowPreview] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
@@ -116,7 +116,7 @@ const UploadComponent: FC = () => {
         {isProcessing ? (
           <LoadingBars />
         ) : (
-          processedImages.length > 0 && <TabDisplay processedImages={processedImages} onUploadAgain={() => {
+          processedImages.length > 0 && <TabDisplay tabImages={processedImages} onUploadAgain={() => {
             setProcessedImages([])
             setFile(null)
             setShowPreview(false)
