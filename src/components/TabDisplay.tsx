@@ -16,14 +16,14 @@ const TabDisplay: FC<TabDisplayProps> = ({tabImages, onUploadAgain}) => {
                 if (canvas) {
                     const ctx = canvas.getContext('2d');
                     if (ctx) {
-                        canvas.width = barBox.box[2] - barBox.box[0];
-                        canvas.height = barBox.box[3] - barBox.box[1];
                         const barImg = new Image();
                         const imageNameNoExtension = tabImage.image_name.replace(/\.png$/, '');
                         const barPath = encodeURI(`/tab_boxes/${imageNameNoExtension}_bar_${boxIdx + 1}.png`);
                         barImg.src = `http://localhost:5000${barPath}`;
                         // draw the image when it is loaded
                         barImg.onload = () => {
+                            canvas.width = barImg.width;
+                            canvas.height = barImg.height;
                             ctx.drawImage(barImg, 0, 0, canvas.width, canvas.height);
                             barBox.fret_strings.forEach((fretString) => {
                                 if (fretString.label === 'number') {
@@ -31,9 +31,11 @@ const TabDisplay: FC<TabDisplayProps> = ({tabImages, onUploadAgain}) => {
                                     const [x1, y1, x2, y2] = fretString.box;
                                     ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
                                 }
-                                // else {
-                                //     ctx.strokeStyle = 'red';
-                                // }
+                                else {
+                                    ctx.strokeStyle = 'red';
+                                    const [x1, y1, x2, y2] = fretString.box;
+                                    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+                                }
                             })
                         };
                         barImg.onerror = () => {

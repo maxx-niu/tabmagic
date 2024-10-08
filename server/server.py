@@ -17,6 +17,7 @@ cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}) # make
 
 TEMP_UPLOAD_FOLDER = './temp_uploads'
 IMAGE_FOLDER = './images'
+TAB_BOXES_FOLDER = './tab_boxes'
 os.makedirs(TEMP_UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(IMAGE_FOLDER, exist_ok=True)
 
@@ -58,11 +59,11 @@ def upload_file():
 
 @app.route('/images/<filename>')
 def get_image(filename):
-    return send_from_directory('../images', filename)
+    return send_from_directory(os.path.abspath(IMAGE_FOLDER), filename)
 
 @app.route('/tab_boxes/<filename>')
 def get_tab_box(filename):
-    return send_from_directory('../tab_boxes', filename)
+    return send_from_directory(os.path.abspath(TAB_BOXES_FOLDER), filename)
 
 @app.route('/process', methods=['POST'])
 def predict():
@@ -71,7 +72,8 @@ def predict():
     clear_directory("./tab_boxes")
 
     for image_path in os.listdir(IMAGE_FOLDER): # for each page in the guitar tab
-        full_path = os.path.join(IMAGE_FOLDER, image_path)
+        full_path = os.path.abspath(os.path.join(IMAGE_FOLDER, image_path))
+        print(f"full image path: {full_path}")
         image = Image.open(full_path)
         bounding_boxes = compute_bounding_boxes(model, image, label_map={1: "bar"})
         bbs_sorted = sort_bar_bounding_boxes(bounding_boxes)
@@ -87,8 +89,10 @@ def predict():
         for row in res['bounding_boxes']:
             for bb in row:
                 bar_file_name = bb['filename']
-                bar_file_path = os.path.join('./tab_boxes', bar_file_name)
+                bar_file_path = os.path.abspath(os.path.join(TAB_BOXES_FOLDER, bar_file_name))
+                print(f"full bar image path: {bar_file_path}")
                 bar_image = Image.open(bar_file_path)
+                print(f"filename: {bar_file_path}, (h,w): {bar_image.height}, {bar_image.width}")
                 string_fret_bounding_boxes = compute_bounding_boxes(bar_model, bar_image, width=512, height=256, label_map={
                     1: "string",
                     2: "number"
