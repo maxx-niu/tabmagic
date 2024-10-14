@@ -66,6 +66,7 @@ const TabDisplay: FC<TabDisplayProps> = ({tabImages, onUploadAgain}) => {
                                         ref={canvas => canvasRefs.current[boxIdx] = canvas}
                                     >
                                     </canvas>
+                                    <p>Filename: {box.filename}</p>
                                 </div>
                             )
                         })}

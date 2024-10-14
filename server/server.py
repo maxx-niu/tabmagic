@@ -90,9 +90,9 @@ def predict():
             for bb in row:
                 bar_file_name = bb['filename']
                 bar_file_path = os.path.abspath(os.path.join(TAB_BOXES_FOLDER, bar_file_name))
-                print(f"full bar image path: {bar_file_path}")
+                #print(f"full bar image path: {bar_file_path}")
                 bar_image = Image.open(bar_file_path)
-                print(f"filename: {bar_file_path}, (h,w): {bar_image.height}, {bar_image.width}")
+                #print(f"filename: {bar_file_path}, (h,w): {bar_image.height}, {bar_image.width}")
                 string_fret_bounding_boxes = compute_bounding_boxes(bar_model, bar_image, width=512, height=256, label_map={
                     1: "string",
                     2: "number"

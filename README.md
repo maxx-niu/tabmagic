@@ -88,3 +88,8 @@ npm run start-dev
 ```
 
 You can now interact with TabMagic on your browser.
+
+
+## Credits
+
+This project includes code from the [Orchestra](https://github.com/AbdallahHemdan/Orchestra) project by Abdallah Hemdan, which is licensed under the MIT License.
