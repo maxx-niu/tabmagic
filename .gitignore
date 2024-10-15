@@ -29,5 +29,6 @@ __pycache__
 /gptab
 /models
 /tab_boxes
+/tab_boxes_staffless
 /generate_numbers/fonts
 /generate_numbers/number_dataset

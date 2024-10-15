@@ -19,5 +19,9 @@ def clear_directory(directory):
             except Exception as e:
                 print(f'Failed to delete {file_path}. Reason: {e}')
     else:
-        # If the directory doesn't exist, let the user know
-        print(f"Directory \"{directory}\" does not exist. Exiting.")
+        # Create the directory if it doesn't exist
+        try:
+            os.makedirs(directory)
+            print(f"Directory \"{directory}\" created.")
+        except Exception as e:
+            print(f"Failed to create directory \"{directory}\". Reason: {e}")

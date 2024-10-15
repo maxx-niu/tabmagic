@@ -11,6 +11,7 @@ import os
 from PIL import Image
 from getTabBboxes import load_model, compute_bounding_boxes, save_bar_bb_to_image, sort_bar_bounding_boxes
 from serverutils import clear_directory
+from lineExtraction import remove_staff_from_image
 
 app = Flask(__name__) # this rferences this server.py file
 cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}) # makes it so that server accepts all requests
@@ -18,6 +19,7 @@ cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}) # make
 TEMP_UPLOAD_FOLDER = './temp_uploads'
 IMAGE_FOLDER = './images'
 TAB_BOXES_FOLDER = './tab_boxes'
+TAB_BOXES_NO_STAFF_FOLDER = './tab_boxes_staffless'
 os.makedirs(TEMP_UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(IMAGE_FOLDER, exist_ok=True)
 
@@ -69,7 +71,8 @@ def get_tab_box(filename):
 def predict():
     model = load_model('./models/tabmagic_model.pth')
     results = []
-    clear_directory("./tab_boxes")
+    clear_directory(TAB_BOXES_FOLDER)
+    clear_directory(TAB_BOXES_NO_STAFF_FOLDER)
 
     for image_path in os.listdir(IMAGE_FOLDER): # for each page in the guitar tab
         full_path = os.path.abspath(os.path.join(IMAGE_FOLDER, image_path))
@@ -90,9 +93,11 @@ def predict():
             for bb in row:
                 bar_file_name = bb['filename']
                 bar_file_path = os.path.abspath(os.path.join(TAB_BOXES_FOLDER, bar_file_name))
+                bar_file_save_path_no_staffs = os.path.abspath(os.path.join(TAB_BOXES_NO_STAFF_FOLDER, bar_file_name))
                 #print(f"full bar image path: {bar_file_path}")
+                staff_lines = remove_staff_from_image(bar_file_path, bar_file_save_path_no_staffs)
                 bar_image = Image.open(bar_file_path)
-                #print(f"filename: {bar_file_path}, (h,w): {bar_image.height}, {bar_image.width}")
+                print(f"filename: {bar_file_path}, (h,w): {bar_image.height}, {bar_image.width}")
                 string_fret_bounding_boxes = compute_bounding_boxes(bar_model, bar_image, width=512, height=256, label_map={
                     1: "string",
                     2: "number"

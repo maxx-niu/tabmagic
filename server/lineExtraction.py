@@ -1,6 +1,7 @@
 import cv2
 from staff_removal import get_staff_lines, remove_staff_lines
 import matplotlib.pyplot as plt
+import numpy as np
 
 def preprocess_img(img_path):
     # 1. Read desired image #
@@ -16,26 +17,28 @@ def preprocess_img(img_path):
     n, m = img.shape
     return n, m, img
 
-def remove_staff_from_image(image_path):
-    # Preprocess the image to get its dimensions and binary form
+def remove_staff_from_image(image_path, output_file_path):
+    """
+    removes the staff lines from the image of a measure specified in image_path, and saves it
+    to the file output_file_path. returns the vertical positions of each removed staff line
+    """
     height, width, in_img = preprocess_img(image_path)
-    
-    # Define a threshold for detecting staff lines
     threshold = 0.8
-    
-    # Get the staff lines and their thicknesses
     staff_lines_thicknesses, staff_lines = get_staff_lines(width, height, in_img, threshold)
-    
-    # Remove the staff lines from the image
     cleaned_img = remove_staff_lines(in_img, width, staff_lines, staff_lines_thicknesses)
+    if cleaned_img.dtype != np.uint8:
+        cleaned_img = (cleaned_img * 255).astype(np.uint8)
+    success = cv2.imwrite(output_file_path, cleaned_img)
+    if not success:
+        raise IOError(f"Failed to save the image to {output_file_path}. Please check the path and permissions.")
+    return staff_lines
     
     # Display the cleaned image
-    plt.imshow(cleaned_img, cmap='gray')
-    plt.title('Image without Staff Lines')
-    plt.axis('off')
-    plt.show()
+    # plt.imshow(cleaned_img, cmap='gray')
+    # plt.title('Image without Staff Lines')
+    # plt.axis('off')
+    # plt.show()
 
-# Example usage
-image_path = 'C:/Users/cakec/Desktop/tabmagic/tab_boxes/3_bar_1.png'
-remove_staff_from_image(image_path)
-# C:/Users/cakec/Desktop/tabmagic/tab_boxes/3_bar_1.png
+# # Example usage
+# image_path = 'C:/Users/cakec/Desktop/tabmagic/tab_boxes/3_bar_1.png'
+# remove_staff_from_image(image_path)
