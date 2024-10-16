@@ -1,44 +1,60 @@
 import cv2
-from staff_removal import get_staff_lines, remove_staff_lines
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 import numpy as np
 
-def preprocess_img(img_path):
-    # 1. Read desired image #
-    img = cv2.imread(img_path, 0)
-    
-    # 2. Remove noise (odd pixels) from the image and save it #
-    img = cv2.fastNlMeansDenoising(img, None, 10, 7, 21)
+def detect_staff_lines(image_path, threshold=0.7):
+    # Read the image in grayscale
+    in_img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    binarized_image = cv2.adaptiveThreshold(
+        in_img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 41, 10
+    )
 
-    # 3. Binarize image using combination of (global + otsu) thresholding and save it #
-    threshold, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-
-    # 4. Return image shape (width, height) and processed image # 
-    n, m = img.shape
-    return n, m, img
-
-def remove_staff_from_image(image_path, output_file_path):
-    """
-    removes the staff lines from the image of a measure specified in image_path, and saves it
-    to the file output_file_path. returns the vertical positions of each removed staff line
-    """
-    height, width, in_img = preprocess_img(image_path)
-    threshold = 0.8
-    staff_lines_thicknesses, staff_lines = get_staff_lines(width, height, in_img, threshold)
-    cleaned_img = remove_staff_lines(in_img, width, staff_lines, staff_lines_thicknesses)
-    if cleaned_img.dtype != np.uint8:
-        cleaned_img = (cleaned_img * 255).astype(np.uint8)
-    success = cv2.imwrite(output_file_path, cleaned_img)
-    if not success:
-        raise IOError(f"Failed to save the image to {output_file_path}. Please check the path and permissions.")
-    return staff_lines
-    
-    # Display the cleaned image
-    # plt.imshow(cleaned_img, cmap='gray')
-    # plt.title('Image without Staff Lines')
+    # plt.subplot(1, 2, 2)
+    # plt.title('Binarized Image')
+    # plt.imshow(binarized_image, cmap='gray')
     # plt.axis('off')
+
     # plt.show()
 
+    
+    # Get image dimensions
+    height, width = binarized_image.shape
+    
+    # Initialize row histogram
+    row_histogram = [0] * height
+    
+    # Calculate histogram for rows
+    for r in range(height):
+        for c in range(width):
+            if binarized_image[r][c] == 0:  # Assuming black pixels are 0
+                row_histogram[r] += 1
+    
+    # Identify initial lines based on the threshold
+    initial_lines = [row for row in range(len(row_histogram)) if row_histogram[row] >= (width * threshold)]
+    
+    # Determine staff lines and their thicknesses
+    staff_lines = []
+    staff_lines_thicknesses = []
+    cur_thickness = 1
+    it = 0
+    
+    while it < len(initial_lines):
+        if cur_thickness == 1:
+            staff_lines.append(initial_lines[it])
+        
+        if it == len(initial_lines) - 1:
+            staff_lines_thicknesses.append(cur_thickness)
+        elif initial_lines[it] + 1 == initial_lines[it + 1]:
+            cur_thickness += 1
+        else:
+            staff_lines_thicknesses.append(cur_thickness)
+            cur_thickness = 1
+        
+        it += 1
+    # print(staff_lines)
+    # print(staff_lines_thicknesses)
+    return staff_lines, staff_lines_thicknesses
+
 # # Example usage
-# image_path = 'C:/Users/cakec/Desktop/tabmagic/tab_boxes/3_bar_1.png'
-# remove_staff_from_image(image_path)
+# image_path = 'C:/Users/cakec/Desktop/tabmagic/tab_boxes/6_bar_1.png'
+# staffLines, thicknesses = detect_staff_lines(image_path)

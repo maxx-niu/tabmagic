@@ -11,7 +11,7 @@ import os
 from PIL import Image
 from getTabBboxes import load_model, compute_bounding_boxes, save_bar_bb_to_image, sort_bar_bounding_boxes
 from serverutils import clear_directory
-from lineExtraction import remove_staff_from_image
+from lineExtraction import detect_staff_lines
 
 app = Flask(__name__) # this rferences this server.py file
 cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}) # makes it so that server accepts all requests
@@ -19,7 +19,6 @@ cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}) # make
 TEMP_UPLOAD_FOLDER = './temp_uploads'
 IMAGE_FOLDER = './images'
 TAB_BOXES_FOLDER = './tab_boxes'
-TAB_BOXES_NO_STAFF_FOLDER = './tab_boxes_staffless'
 os.makedirs(TEMP_UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(IMAGE_FOLDER, exist_ok=True)
 
@@ -72,7 +71,6 @@ def predict():
     model = load_model('./models/tabmagic_model.pth')
     results = []
     clear_directory(TAB_BOXES_FOLDER)
-    clear_directory(TAB_BOXES_NO_STAFF_FOLDER)
 
     for image_path in os.listdir(IMAGE_FOLDER): # for each page in the guitar tab
         full_path = os.path.abspath(os.path.join(IMAGE_FOLDER, image_path))
@@ -88,21 +86,19 @@ def predict():
         }
         # TODO next: go through each bar image in bbs_sorted (by accessing the filename from bounding_boxes)
         # and run the bar_model detection on it, to extract the string and identify fret numbers
-        bar_model = load_model('./models/tabmagic_model_bars.pth', num_classes=3)
+        bar_model = load_model('./models/tabmagic_model_bars.pth', num_classes=2)
         for row in res['bounding_boxes']:
             for bb in row:
                 bar_file_name = bb['filename']
                 bar_file_path = os.path.abspath(os.path.join(TAB_BOXES_FOLDER, bar_file_name))
-                bar_file_save_path_no_staffs = os.path.abspath(os.path.join(TAB_BOXES_NO_STAFF_FOLDER, bar_file_name))
-                #print(f"full bar image path: {bar_file_path}")
-                staff_lines = remove_staff_from_image(bar_file_path, bar_file_save_path_no_staffs)
                 bar_image = Image.open(bar_file_path)
-                print(f"filename: {bar_file_path}, (h,w): {bar_image.height}, {bar_image.width}")
-                string_fret_bounding_boxes = compute_bounding_boxes(bar_model, bar_image, width=512, height=256, label_map={
-                    1: "string",
-                    2: "number"
-                }, confidence_threshold=0.9, iou_threshold=0.95)
-                bb['fret_strings'] = string_fret_bounding_boxes
+                # print(f"full bar image path: {bar_file_path}")
+                staff_lines, staff_line_thicknesses = detect_staff_lines(bar_file_path)
+                # print(f"filename: {bar_file_path}, (h,w): {bar_image.height}, {bar_image.width}")
+                fret_bounding_boxes = compute_bounding_boxes(bar_model, bar_image, width=512, height=256, label_map={1: "number"})
+                bb['numbers'] = fret_bounding_boxes
+                staff_line_info = list(zip(staff_lines, staff_line_thicknesses))
+                bb['staff_line_info'] = staff_line_info
 
         results.append(res)
              

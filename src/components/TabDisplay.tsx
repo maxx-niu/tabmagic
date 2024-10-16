@@ -25,17 +25,18 @@ const TabDisplay: FC<TabDisplayProps> = ({tabImages, onUploadAgain}) => {
                             canvas.width = barImg.width;
                             canvas.height = barImg.height;
                             ctx.drawImage(barImg, 0, 0, canvas.width, canvas.height);
-                            barBox.fret_strings.forEach((fretString) => {
-                                if (fretString.label === 'number') {
-                                    ctx.strokeStyle = 'black';
-                                    const [x1, y1, x2, y2] = fretString.box;
-                                    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-                                }
-                                else {
-                                    ctx.strokeStyle = 'red';
-                                    const [x1, y1, x2, y2] = fretString.box;
-                                    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-                                }
+                            barBox.numbers.forEach((fretNum) => {
+                                ctx.strokeStyle = 'black';
+                                const [x1, y1, x2, y2] = fretNum.box;
+                                ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+                            })
+                            barBox.staff_line_info.forEach(([staffPos, staffThickness]) => {
+                                ctx.strokeStyle = 'red';
+                                ctx.lineWidth = staffThickness;
+                                ctx.beginPath();
+                                ctx.moveTo(0, staffPos); // Start at the left edge
+                                ctx.lineTo(canvas.width, staffPos); // Draw to the right edge
+                                ctx.stroke();
                             })
                         };
                         barImg.onerror = () => {
