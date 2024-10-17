@@ -1,12 +1,8 @@
-import React, { FC, useEffect, useRef } from 'react';
+import { FC, useEffect, useRef } from 'react';
 import { tabImage } from '../types';
+import { TabDisplayProps } from '../types';
 
-type TabDisplayProps = {
-    tabImages: tabImage[];
-    onUploadAgain: () => void;
-}
-
-const TabDisplay: FC<TabDisplayProps> = ({tabImages, onUploadAgain}) => {
+const TabDisplay: FC<TabDisplayProps> = ({ tabImages, onUploadAgain }) => {
     const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
 
     useEffect(() => {
@@ -80,21 +76,3 @@ const TabDisplay: FC<TabDisplayProps> = ({tabImages, onUploadAgain}) => {
 };
 
 export default TabDisplay;
-
-/*return (<div key={imgIdx}>
-                    <img 
-                        src={`http://localhost:5000${tabImage.image_path}`}
-                        alt='Tab Page Preview'
-                        style={{ maxWidth: '100%', height: 'auto', marginBottom: '20px' }}
-                    />
-                    {tabImage.bounding_boxes.flat().map((box, boxIdx) => {
-                        const imageNameNoExtension = tabImage.image_name.replace(/\.png$/, '');
-                        const barPath = encodeURI(`/tab_boxes/${imageNameNoExtension}_bar_${boxIdx + 1}.png`);
-                        return (<div key={boxIdx} style={{ marginBottom: '10px'}}>
-                            <img 
-                                src={`http://localhost:5000${barPath}`}
-                                alt={`Bar ${boxIdx + 1}`}
-                            />
-                        </div>)
-                    })}
-                </div>)*/

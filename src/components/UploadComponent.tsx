@@ -6,6 +6,7 @@ import TabDisplay from './TabDisplay';
 import Preview from './Preview';
 import { tabImage } from '../types';
 import LoadingBars from './LoadingBars';
+import TabMeasureAdjust from './TabMeasureAdjust';
 
 const UploadComponent: FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -116,7 +117,7 @@ const UploadComponent: FC = () => {
         {isProcessing ? (
           <LoadingBars />
         ) : (
-          processedImages.length > 0 && <TabDisplay tabImages={processedImages} onUploadAgain={() => {
+          processedImages.length > 0 && <TabMeasureAdjust tabImages={processedImages} onUploadAgain={() => {
             setProcessedImages([])
             setFile(null)
             setShowPreview(false)

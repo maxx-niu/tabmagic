@@ -2,7 +2,7 @@ import cv2
 from matplotlib import pyplot as plt
 import numpy as np
 
-def detect_staff_lines(image_path, threshold=0.7):
+def detect_staff_lines(image_path, threshold=0.6):
     # Read the image in grayscale
     in_img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     binarized_image = cv2.adaptiveThreshold(
@@ -56,5 +56,5 @@ def detect_staff_lines(image_path, threshold=0.7):
     return staff_lines, staff_lines_thicknesses
 
 # # Example usage
-# image_path = 'C:/Users/cakec/Desktop/tabmagic/tab_boxes/6_bar_1.png'
+# image_path = 'C:/Users/cakec/Desktop/tabmagic/tab_boxes/Screenshot 2024-07-30 214511_bar_6.png'
 # staffLines, thicknesses = detect_staff_lines(image_path)

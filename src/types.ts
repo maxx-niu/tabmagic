@@ -34,3 +34,8 @@ export type UploadSuccessfulBoxProps = {
     onCancel: () => void,
     setProcessedImages: React.Dispatch<React.SetStateAction<tabImage[]>>
 };
+
+export type TabDisplayProps = {
+    tabImages: tabImage[];
+    onUploadAgain: () => void;
+}
