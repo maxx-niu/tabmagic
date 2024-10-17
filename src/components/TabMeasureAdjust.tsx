@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { tabImage } from '../types';
 import BarBoundingBox from './BarBoundingBox';
 
@@ -8,58 +8,63 @@ type TabDisplayProps = {
 }
 
 const TabMeasureAdjust: FC<TabDisplayProps> = ({ tabImages, onUploadAgain }) => {
-    const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
+    const [boundingBoxes, setBoundingBoxes] = useState<number[][]>([]);
+
+    const updateBox = (index: number, newBox: number[]) => {
+        const updatedBoxes = [...boundingBoxes];
+        updatedBoxes[index] = newBox;
+        setBoundingBoxes(updatedBoxes);
+    };
+
+    const deleteBox = (index: number) => {
+        const updatedBoxes = boundingBoxes.filter((_, i) => i !== index);
+        setBoundingBoxes(updatedBoxes);
+    };
 
     useEffect(() => {
-        tabImages.forEach((tabImage, imgIdx) => {
-            const canvas = canvasRefs.current[imgIdx];
-            if (canvas) {
-                const ctx = canvas.getContext('2d');
-                if (ctx) {
-                    // Load the image to get its dimensions
-                    const img = new Image();
-                    img.src = `http://localhost:5000${tabImage.image_path}`;
-                    img.onload = () => {
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear any previous drawings
-
-                        // Draw all bounding boxes
-                        tabImage.bounding_boxes.flat().forEach((barBox) => {
-                            const [x1, y1, x2, y2] = barBox.box;
-                            ctx.strokeStyle = 'green';
-                            ctx.lineWidth = 2;
-                            ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-                        });
-                    };
-                }
-            }
-        });
+        const extractedBoundingBoxes = tabImages.flatMap(image => 
+            image.bounding_boxes.flat().map(bb => bb.box)
+        );
+        setBoundingBoxes(extractedBoundingBoxes);
     }, [tabImages]);
 
     return (
-        <div>
-            {tabImages.map((tabImage, imgIdx) => (
-                <div key={imgIdx} style={{ position: 'relative', display: 'inline-block' }}>
-                    <img 
-                        src={`http://localhost:5000${tabImage.image_path}`}
-                        alt='Tab Page Preview'
-                        style={{ maxWidth: '100%', height: 'auto', marginBottom: '20px' }}
-                    />
-                    <canvas
-                        ref={canvas => canvasRefs.current[imgIdx] = canvas}
-                        style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            pointerEvents: 'none', // Ensure the canvas doesn't block interactions
-                            zIndex: 1
-                        }}
-                    />
-                </div>
-            ))}
+        <>
+            <div>
+                {tabImages.map((tabImage, imgIdx) => {
+                    console.log(tabImage);
+                    return (
+                        <div 
+                            key={imgIdx} 
+                            style={{ 
+                                backgroundImage: `url('http://localhost:5000${tabImage.image_path}')`,
+                                backgroundSize: 'contain',
+                                backgroundPosition: 'center',
+                                width: tabImage.image_width,
+                                height: tabImage.image_height,
+                                position: 'relative'
+                            }}
+                        >
+                            {
+                                boundingBoxes.map((bb, bbIdx) => {
+                                    return (   
+                                        <BarBoundingBox
+                                            key={bbIdx}
+                                            box={bb}
+                                            onUpdate={(newBox) => updateBox(bbIdx, newBox)}
+                                            onDelete={() => deleteBox(bbIdx)}
+                                            imageHeight={tabImage.image_height}
+                                            imageWidth={tabImage.image_width}
+                                        ></BarBoundingBox>
+                                    )
+                                })
+                            }
+                        </div>
+                    )
+            })}
+            </div>
             <button onClick={onUploadAgain}>Upload another tab</button>
-        </div>
+        </>
     );
 };
 
@@ -82,3 +87,4 @@ export default TabMeasureAdjust;
                         </div>)
                     })}
                 </div>)*/
+

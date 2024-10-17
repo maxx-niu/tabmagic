@@ -17,7 +17,9 @@ export type tabImage = {
         staff_line_info: StaffLineInfo[]
     }>>;
     image_path: string;
-    image_name: string
+    image_name: string;
+    image_width: number;
+    image_height: number;
 };
 
 type FretStringBox = {

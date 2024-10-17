@@ -82,7 +82,9 @@ def predict():
         res = {
             'image_path': f'/images/{image_path}',
             'bounding_boxes': bbs_sorted,
-            'image_name': image_path
+            'image_name': image_path,
+            'image_width': image.width,
+            'image_height': image.height
         }
         # TODO next: go through each bar image in bbs_sorted (by accessing the filename from bounding_boxes)
         # and run the bar_model detection on it, to extract the string and identify fret numbers
