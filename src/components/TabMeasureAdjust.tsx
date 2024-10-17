@@ -1,31 +1,47 @@
 import { FC, useEffect, useState } from 'react';
 import { tabImage } from '../types';
 import BarBoundingBox from './BarBoundingBox';
+import { TabDisplayProps } from '../types';
+import { v4 as uuidv4 } from 'uuid';
 
-type TabDisplayProps = {
-    tabImages: tabImage[];
-    onUploadAgain: () => void;
+type BoundingBox = {
+    id: string;
+    box: number[];
 }
 
 const TabMeasureAdjust: FC<TabDisplayProps> = ({ tabImages, onUploadAgain }) => {
-    const [boundingBoxes, setBoundingBoxes] = useState<number[][]>([]);
+    const [boundingBoxes, setBoundingBoxes] = useState<BoundingBox[]>([]);
 
-    const updateBox = (index: number, newBox: number[]) => {
-        const updatedBoxes = [...boundingBoxes];
-        updatedBoxes[index] = newBox;
-        setBoundingBoxes(updatedBoxes);
+    const updateBox = (id: string, newBox: number[]) => {
+        setBoundingBoxes((prevBoxes) => 
+            prevBoxes.map(prevBox => 
+                prevBox.id === id ? {...prevBox, box: newBox} : prevBox
+            )
+        );
     };
 
-    const deleteBox = (index: number) => {
-        const updatedBoxes = boundingBoxes.filter((_, i) => i !== index);
-        setBoundingBoxes(updatedBoxes);
+    const deleteBox = (id: string) => {
+        setBoundingBoxes((prevList) => 
+            prevList.filter(prevBox => prevBox.id !== id)
+        )
+    };
+
+    const addBox = (newBox: number[]) => {
+        setBoundingBoxes((prevBoxes) => [...prevBoxes, {
+            id: uuidv4(),
+            box: newBox
+        }])
     };
 
     useEffect(() => {
-        const extractedBoundingBoxes = tabImages.flatMap(image => 
-            image.bounding_boxes.flat().map(bb => bb.box)
+        const extractedBoundingBoxes: BoundingBox[] = tabImages.flatMap(image => 
+            image.bounding_boxes.flat().map((bb) => ({
+                id: uuidv4(),
+                box: bb.box
+            }))
         );
         setBoundingBoxes(extractedBoundingBoxes);
+
     }, [tabImages]);
 
     return (
@@ -46,13 +62,13 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({ tabImages, onUploadAgain }) => 
                             }}
                         >
                             {
-                                boundingBoxes.map((bb, bbIdx) => {
+                                boundingBoxes.map((bb) => {
                                     return (   
                                         <BarBoundingBox
-                                            key={bbIdx}
-                                            box={bb}
-                                            onUpdate={(newBox) => updateBox(bbIdx, newBox)}
-                                            onDelete={() => deleteBox(bbIdx)}
+                                            key={bb.id}
+                                            box={bb.box}
+                                            onUpdate={(newBox) => updateBox(bb.id, newBox)}
+                                            onDelete={() => deleteBox(bb.id)}
                                             imageHeight={tabImage.image_height}
                                             imageWidth={tabImage.image_width}
                                         ></BarBoundingBox>
@@ -63,7 +79,8 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({ tabImages, onUploadAgain }) => 
                     )
             })}
             </div>
-            <button onClick={onUploadAgain}>Upload another tab</button>
+            <button onClick={() => addBox([0, 0, 100, 100])}>Add a bounding box</button>
+            <button onClick={() => onUploadAgain}>Upload another tab</button>
         </>
     );
 };
