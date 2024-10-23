@@ -12,9 +12,9 @@ export type tabImage = {
         score: number;
         box: number[];
         label: string;
-        filename: string;
-        numbers: FretStringBox[];
-        staff_line_info: StaffLineInfo[]
+        // filename: string;
+        // numbers: FretStringBox[];
+        // staff_line_info: StaffLineInfo[]
     }>>;
     image_path: string;
     image_name: string;
@@ -22,14 +22,14 @@ export type tabImage = {
     image_height: number;
 };
 
-type FretStringBox = {
-    box: number[],
-    score: number,
-    label: string
-}
+// type FretStringBox = {
+//     box: number[],
+//     score: number,
+//     label: string
+// }
 
 // staff_position, staff_line_thickness
-type StaffLineInfo = [number, number];
+// type StaffLineInfo = [number, number];
 
 export type UploadSuccessfulBoxProps = {
     isOpen: boolean,

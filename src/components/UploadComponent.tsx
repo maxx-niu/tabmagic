@@ -2,7 +2,6 @@ import { useCallback, useState, FC } from 'react';
 import { FileRejection, useDropzone } from 'react-dropzone';
 import '../styles/UploadComponent.css';
 import UploadErrorBox from './UploadErrorBox';
-import TabDisplay from './TabDisplay';
 import Preview from './Preview';
 import { tabImage } from '../types';
 import LoadingBars from './LoadingBars';

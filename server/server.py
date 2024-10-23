@@ -78,7 +78,7 @@ def predict():
         image = Image.open(full_path)
         bounding_boxes = compute_bounding_boxes(model, image, label_map={1: "bar"})
         bbs_sorted = sort_bar_bounding_boxes(bounding_boxes)
-        save_bar_bb_to_image(bbs_sorted, full_path, u=5, d=5) # save the images of the bars to the tab_boxes dir
+        # save_bar_bb_to_image(bbs_sorted, full_path, u=5, d=5) # save the images of the bars to the tab_boxes dir
         res = {
             'image_path': f'/images/{image_path}',
             'bounding_boxes': bbs_sorted,
@@ -88,19 +88,19 @@ def predict():
         }
         # TODO next: go through each bar image in bbs_sorted (by accessing the filename from bounding_boxes)
         # and run the bar_model detection on it, to extract the string and identify fret numbers
-        bar_model = load_model('./models/tabmagic_model_bars.pth', num_classes=2)
-        for row in res['bounding_boxes']:
-            for bb in row:
-                bar_file_name = bb['filename']
-                bar_file_path = os.path.abspath(os.path.join(TAB_BOXES_FOLDER, bar_file_name))
-                bar_image = Image.open(bar_file_path)
-                # print(f"full bar image path: {bar_file_path}")
-                staff_lines, staff_line_thicknesses = detect_staff_lines(bar_file_path)
-                # print(f"filename: {bar_file_path}, (h,w): {bar_image.height}, {bar_image.width}")
-                fret_bounding_boxes = compute_bounding_boxes(bar_model, bar_image, width=512, height=256, label_map={1: "number"})
-                bb['numbers'] = fret_bounding_boxes
-                staff_line_info = list(zip(staff_lines, staff_line_thicknesses))
-                bb['staff_line_info'] = staff_line_info
+        # bar_model = load_model('./models/tabmagic_model_bars.pth', num_classes=2)
+        # for row in res['bounding_boxes']:
+        #     for bb in row:
+        #         bar_file_name = bb['filename']
+        #         bar_file_path = os.path.abspath(os.path.join(TAB_BOXES_FOLDER, bar_file_name))
+        #         bar_image = Image.open(bar_file_path)
+        #         # print(f"full bar image path: {bar_file_path}")
+        #         staff_lines, staff_line_thicknesses = detect_staff_lines(bar_file_path)
+        #         # print(f"filename: {bar_file_path}, (h,w): {bar_image.height}, {bar_image.width}")
+        #         fret_bounding_boxes = compute_bounding_boxes(bar_model, bar_image, width=512, height=256, label_map={1: "number"})
+        #         bb['numbers'] = fret_bounding_boxes
+        #         staff_line_info = list(zip(staff_lines, staff_line_thicknesses))
+        #         bb['staff_line_info'] = staff_line_info
 
         results.append(res)
              
