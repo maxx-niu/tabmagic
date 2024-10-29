@@ -1,4 +1,4 @@
-import { useCallback, useState, FC } from 'react';
+import { useCallback, useState, FC, useEffect } from 'react';
 import { FileRejection, useDropzone } from 'react-dropzone';
 import '../styles/UploadComponent.css';
 import UploadErrorBox from './UploadErrorBox';
@@ -7,7 +7,12 @@ import { tabImage } from '../types';
 import LoadingBars from './LoadingBars';
 import TabMeasureAdjust from './TabMeasureAdjust';
 
-const UploadComponent: FC = () => {
+type UploadComponentProps = {
+  onValidFile: () => void,
+  onNoFile: () => void
+}
+
+const UploadComponent: FC<UploadComponentProps> = ({onValidFile, onNoFile}) => {
   const [file, setFile] = useState<File | null>(null);
   const [showUploadErrorBox, setShowUploadErrorBox] = useState(false);
   const [uploadError, setUploadError] = useState<{
@@ -17,6 +22,14 @@ const UploadComponent: FC = () => {
   const [processedImages, setProcessedImages] = useState<tabImage[]>([]);
   const [showPreview, setShowPreview] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (processedImages.length > 0 || isProcessing) {
+      onValidFile();
+    } else {
+      onNoFile();
+    }
+  }, [processedImages, isProcessing, onValidFile, onNoFile]);
 
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
     if(rejectedFiles.length === 0){

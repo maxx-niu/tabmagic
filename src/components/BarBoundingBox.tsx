@@ -8,9 +8,11 @@ type BoundingBoxProps = {
     imageHeight: number;
     onDelete: () => void;
     flash?: boolean;
+    onUpdate: (newBox: number[]) => void;
+    scaleFactor: number;
 }
 
-const BarBoundingBox: FC<BoundingBoxProps> = ({ box, imageWidth, imageHeight, onDelete, flash }) => {
+const BarBoundingBox: FC<BoundingBoxProps> = ({ box, imageWidth, imageHeight, onDelete, flash, onUpdate, scaleFactor }) => {
     const [boxState, setBoxState] = useState<{
         left: number;
         top: number;
@@ -48,20 +50,56 @@ const BarBoundingBox: FC<BoundingBoxProps> = ({ box, imageWidth, imageHeight, on
                 x: (boxState.left / 100) * imageWidth, 
                 y: (boxState.top / 100) * imageHeight
             }}
+            bounds="parent"
+            enableResizing={{
+                top: true,
+                right: true,
+                bottom: true,
+                left: true,
+                topRight: true,
+                bottomRight: true,
+                bottomLeft: true,
+                topLeft: true
+            }}
             onDragStop={(e, d) => {
-                setBoxState((prevBoxState) => ({...prevBoxState, left: (d.x / imageWidth) * 100,
-                    top: (d.y / imageHeight) * 100 }));
+                const newLeft = (d.x / imageWidth) * 100;
+                const newTop = (d.y / imageHeight) * 100;
+                setBoxState(prev => ({
+                    ...prev,
+                    left: newLeft,
+                    top: newTop
+                }));
+                // Convert back to original scale
+                const x1 = (newLeft / 100) * imageWidth;
+                const y1 = (newTop / 100) * imageHeight;
+                const x2 = x1 + (boxState.width / 100) * imageWidth;
+                const y2 = y1 + (boxState.height / 100) * imageHeight;
+                const newBox = [x1, y1, x2, y2].map(num => (1 / scaleFactor) * num);
+                console.log(newBox);
+                onUpdate(newBox);
             }}
             onResizeStop={(e, direction, ref, delta, position) => {
-                setBoxState((prevBoxState) => ({
-                    ...prevBoxState,
-                    width: parseFloat(ref.style.width),
-                    height: parseFloat(ref.style.height),
-                    left: (position.x / imageWidth) * 100,
-                    top: (position.y / imageHeight) * 100
+                const newWidth = (ref.offsetWidth / imageWidth) * 100;
+                const newHeight = (ref.offsetHeight / imageHeight) * 100;
+                const newLeft = (position.x / imageWidth) * 100;
+                const newTop = (position.y / imageHeight) * 100;
+                setBoxState(prev => ({
+                    ...prev,
+                    width: newWidth,
+                    height: newHeight,
+                    left: newLeft,
+                    top: newTop,
+                    resizeDirection: direction
                 }));
+                
+                // Convert back to original scale
+                const x1 = (newLeft / 100) * imageWidth;
+                const y1 = (newTop / 100) * imageHeight;
+                const x2 = x1 + (newWidth / 100) * imageWidth;
+                const y2 = y1 + (newHeight / 100) * imageHeight;
+                const newBox = [x1, y1, x2, y2].map(num => (1 / scaleFactor) * num);
+                onUpdate(newBox);
             }}
-            bounds="parent"
         >
             <button 
                 onClick={onDelete} 
@@ -81,6 +119,7 @@ const BarBoundingBox: FC<BoundingBoxProps> = ({ box, imageWidth, imageHeight, on
             >
                 X
             </button>
+            <p>{boxState.height}, {boxState.width}</p>
         </Rnd>
     );
 }
