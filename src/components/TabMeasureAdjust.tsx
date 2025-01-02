@@ -2,14 +2,22 @@ import { FC, useEffect, useState } from "react";
 import BarBoundingBox from "./BarBoundingBox";
 import { BoundingBox, TabDisplayProps } from "../types";
 import { v4 as uuidv4 } from "uuid";
+import useUploadBoxes from "../hooks/useUploadBoxes";
 import "../styles/TabMeasureAdjust.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 const TabMeasureAdjust: FC<TabDisplayProps> = ({ tabImages, onUploadAgain }) => {
-  const [boundingBoxes, setBoundingBoxes] = useState<BoundingBox[][]>([]);
+  const [boundingBoxes, setBoundingBoxes] = useState<BoundingBox[][]>([]); // state that holds the bounding boxes for each bar for all pages
   const [flashId, setFlashId] = useState<string | null>(null);
   const [availableHeight, setAvailableHeight] = useState(window.innerHeight);
   const [currentPage, setCurrentPage] = useState(0);
+
+  const { uploadBoxes, loading, error } = useUploadBoxes();
+
+  const handleProcessBars = () => {
+    const paths = tabImages.map((image) => image.image_path);
+    uploadBoxes(paths, boundingBoxes);
+  };
 
   const deleteBox = (id: string, pageIndex: number) => {
     setBoundingBoxes((prevBoxes) =>
@@ -29,9 +37,11 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({ tabImages, onUploadAgain }) => 
   };
 
   const updateBox = (updatedBox: number[], boxId: string, pageIndex: number) => {
+    const [x1, y1, x2, y2] = updatedBox;
+
     setBoundingBoxes((prevBoxes) =>
       prevBoxes.map((boxes, idx) =>
-        idx === pageIndex ? boxes.map((box) => (box.id === boxId ? { ...box, box: updatedBox } : box)) : boxes
+        idx === pageIndex ? boxes.map((box) => (box.id === boxId ? { ...box, x1, y1, x2, y2 } : box)) : boxes
       )
     );
   };
@@ -158,9 +168,8 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({ tabImages, onUploadAgain }) => 
             Upload another tab
           </button>
           <button
-            onClick={() => {
-              console.log("TODO");
-            }}
+            // finish this button
+            onClick={handleProcessBars}
             style={{
               backgroundColor: "green",
               color: "white",

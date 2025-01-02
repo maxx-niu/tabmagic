@@ -66,6 +66,15 @@ def get_image(filename):
 def get_tab_box(filename):
     return send_from_directory(os.path.abspath(TAB_BOXES_FOLDER), filename)
 
+@app.route('/process-boxes', methods=['POST'])
+# TODO: get the images from the bounding boxes next. return data to fix flask error
+def process_boxes():
+    data = request.get_json().get('data', [])
+    for item in data:
+        image_path = item.get('image_path')
+        print(image_path)
+    
+
 @app.route('/process', methods=['POST'])
 def predict():
     model = load_model('./models/tabmagic_model.pth')
@@ -86,6 +95,7 @@ def predict():
             'image_width': image.width,
             'image_height': image.height
         }
+        # (can probably ignore this for now, left in here just in case)
         # TODO next: go through each bar image in bbs_sorted (by accessing the filename from bounding_boxes)
         # and run the bar_model detection on it, to extract the string and identify fret numbers
         # bar_model = load_model('./models/tabmagic_model_bars.pth', num_classes=2)
