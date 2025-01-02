@@ -1,8 +1,28 @@
+.tab-measure-adjust-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  max-height: 100%;
+}
+
 .tab-measure-adjust {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: auto;
-    max-height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.page-nav-button {
+  background-color: gray;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  max-height: fit-content;
+}
+
+.disable-page-nav {
+  background-color: lightgray;
+  cursor: context-menu;
 }

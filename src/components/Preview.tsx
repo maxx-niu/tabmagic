@@ -1,12 +1,12 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useEffect, useState } from "react";
 
 type PreviewProps = {
-    file: File;
-    onConfirm: () => void;
-    onDeny: () => void;
-}
+  file: File;
+  onConfirm: () => void;
+  onDeny: () => void;
+};
 
-const Preview: FC<PreviewProps> = ({file, onConfirm, onDeny}) => {
+const Preview: FC<PreviewProps> = ({ file, onConfirm, onDeny }) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -23,18 +23,22 @@ const Preview: FC<PreviewProps> = ({file, onConfirm, onDeny}) => {
       <h5>{file.name}</h5>
       {previewUrl && (
         <div>
-            <img
-              src={previewUrl}
-              alt="File preview"
-              style={{ maxWidth: '100%', maxHeight: '300px', marginBottom: '10px' }}
-            />
+          <img
+            src={previewUrl}
+            alt="File preview"
+            style={{ maxWidth: "100%", maxHeight: "300px", marginBottom: "10px" }}
+          />
         </div>
       )}
       <p>Is this what you would like to have analyzed?</p>
-      <button type="button" onClick={onDeny}>No</button>
-      <button type="button" onClick={onConfirm}>Yes</button>
+      <button type="button" onClick={onDeny}>
+        No
+      </button>
+      <button type="button" onClick={onConfirm}>
+        Yes
+      </button>
     </div>
-  )
-}
+  );
+};
 
-export default Preview
+export default Preview;

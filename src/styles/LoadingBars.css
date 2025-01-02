@@ -1,40 +1,40 @@
 .loading-bar-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
 }
 
 .loading-bar-1,
 .loading-bar-2,
 .loading-bar-3 {
-    width: 2rem;
-    height: 7rem;
-    border: 1px solid black;
-    border-radius: 6px;
-    position: relative;
-    animation: loading-bar-1-animation 0.4s infinite alternate;
-    background-color: #3F84E6;
+  width: 2rem;
+  height: 7rem;
+  border: 1px solid black;
+  border-radius: 6px;
+  position: relative;
+  animation: loading-bar-1-animation 0.4s infinite alternate;
+  background-color: #3f84e6;
 }
 
 .loading-bar-1 {
-    margin-right: 1rem;
-    animation-delay: -0.4s;
+  margin-right: 1rem;
+  animation-delay: -0.4s;
 }
 
 .loading-bar-2 {
-    animation-delay: -0.2s;
+  animation-delay: -0.2s;
 }
 
 .loading-bar-3 {
-    margin-left: 1rem;
+  margin-left: 1rem;
 }
 
 @keyframes loading-bar-1-animation {
-    from {
-        height: 10rem;
-    }
-    to {
-        height: 7rem;
-    }
+  from {
+    height: 10rem;
+  }
+  to {
+    height: 7rem;
+  }
 }

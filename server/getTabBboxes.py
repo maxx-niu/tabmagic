@@ -7,6 +7,7 @@ from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision.ops import nms
 from PIL import Image
 from torchvision import transforms
+import uuid
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -64,7 +65,13 @@ def compute_bounding_boxes(model, image, confidence_threshold=0.5, iou_threshold
     if label_map:
         labels = [label_map.get(label, label) for label in labels]
     
-    result = [{'box': box.tolist(), 'score': float(score), 'label': label} for box, score, label in zip(boxes, scores, labels)]
+    result = [{ 'box': {
+        'id': str(uuid.uuid4()),
+        'x1': box.tolist()[0],
+        'y1': box.tolist()[1],
+        'x2': box.tolist()[2],
+        'y2': box.tolist()[3]
+    }, 'score': float(score), 'label': label} for box, score, label in zip(boxes, scores, labels)]
     return result
 
 
@@ -99,10 +106,10 @@ def sort_bar_bounding_boxes(bbs: List[dict]): # bbs are in [x1, y1, x2, y2] form
     """
     Sorts the extracted bar bounding boxes of a tablature page from left->right, top->bottom
     """
-    bbs_sorted = sorted(bbs, key=lambda box: box["box"][1])
+    bbs_sorted = sorted(bbs, key=lambda box: box["box"]["y1"])
     def box_overlap(box1, box2):
         # vertically overlapping boxes are of the same row
-        return max(0, min(box1[3], box2[3]) - max(box1[1], box2[1])) > 0
+        return max(0, min(box1["y2"], box2["y2"]) - max(box1["y1"], box2["y1"])) > 0
     
     rows = []
 
@@ -117,5 +124,5 @@ def sort_bar_bounding_boxes(bbs: List[dict]): # bbs are in [x1, y1, x2, y2] form
         if not placed_in_row:
             rows.append([box])
     for row in rows:
-        row.sort(key=lambda box: box["box"][0])
+        row.sort(key=lambda box: box["box"]["x1"])
     return rows

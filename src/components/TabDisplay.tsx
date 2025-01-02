@@ -1,9 +1,7 @@
-import React from 'react';
+import React from "react";
 
 const TabDisplay = () => {
-  return (
-    <div></div>
-  );
+  return <div></div>;
 };
 
 export default TabDisplay;
@@ -11,7 +9,6 @@ export default TabDisplay;
 // import { FC, useEffect, useRef } from 'react';
 // import { tabImage } from '../types';
 // import { TabDisplayProps } from '../types';
-
 // const TabDisplay: FC<TabDisplayProps> = ({ tabImages, onUploadAgain }) => {
 //     const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
 
@@ -50,7 +47,7 @@ export default TabDisplay;
 //                         };
 //                     }
 //                 }
-//             });    
+//             });
 //         });
 //     }, [tabImages]);
 
@@ -60,7 +57,7 @@ export default TabDisplay;
 //                 console.log(tabImage);
 //                 return(
 //                     <div key={imgIdx}>
-//                         <img 
+//                         <img
 //                             src={`http://localhost:5000${tabImage.image_path}`}
 //                             alt='Tab Page Preview'
 //                             style={{ maxWidth: '100%', height: 'auto', marginBottom: '20px' }}
@@ -69,7 +66,7 @@ export default TabDisplay;
 //                             return (
 //                                 <div key={boxIdx} style={{ marginBottom: '10px'}}>
 //                                     <canvas
-//                                         key={boxIdx} 
+//                                         key={boxIdx}
 //                                         ref={canvas => canvasRefs.current[boxIdx] = canvas}
 //                                     >
 //                                     </canvas>

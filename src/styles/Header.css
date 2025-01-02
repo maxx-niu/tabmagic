@@ -2,17 +2,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #1D3961;
+  background-color: #1d3961;
   width: 100%;
 }
-  
+
 .nav-links {
   display: flex;
   list-style-type: none;
   padding: 0;
 }
-  
-.nav-links li{
+
+.nav-links li {
   margin-right: 20px;
 }
 
