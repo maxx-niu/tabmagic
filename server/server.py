@@ -72,7 +72,13 @@ def process_boxes():
     data = request.get_json().get('data', [])
     for item in data:
         image_path = item.get('image_path')
-        print(image_path)
+        image_name = os.path.basename(image_path)
+        full_path = os.path.abspath(os.path.join(IMAGE_FOLDER, image_name))
+        print(full_path)
+        bounding_boxes = item.get('bounding_boxes')
+        bbs_sorted = sort_bar_bounding_boxes(bounding_boxes)
+        print(bbs_sorted)
+        save_bar_bb_to_image(bbs_sorted, full_path, u=5, d=5) # save the images of the bars to the tab_boxes dir
     
 
 @app.route('/process', methods=['POST'])
@@ -83,6 +89,7 @@ def predict():
 
     for image_path in os.listdir(IMAGE_FOLDER): # for each page in the guitar tab
         full_path = os.path.abspath(os.path.join(IMAGE_FOLDER, image_path))
+        print("image path:", image_path)
         print(f"full image path: {full_path}")
         image = Image.open(full_path)
         bounding_boxes = compute_bounding_boxes(model, image, label_map={1: "bar"})

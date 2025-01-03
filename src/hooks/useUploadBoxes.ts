@@ -3,7 +3,9 @@ import { BoundingBox } from "../types";
 
 interface Payload {
   image_path: string;
-  bounding_boxes: BoundingBox[];
+  bounding_boxes: {
+    box: BoundingBox;
+  }[];
 }
 
 const useUploadBoxes = () => {
@@ -17,7 +19,7 @@ const useUploadBoxes = () => {
 
     const payload: Payload[] = paths.map((path, idx) => ({
       image_path: path,
-      bounding_boxes: boxes[idx],
+      bounding_boxes: boxes[idx].map((box) => ({ box })),
     }));
 
     try {

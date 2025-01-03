@@ -79,6 +79,7 @@ def save_bar_bb_to_image(bbs: List[List[dict]], image_path, save_dir="tab_boxes"
     """
     Given the bar bounding boxes of a tablature page, extract them and save them as images.
     """
+    print("IAM CALLED")
     image = Image.open(image_path)
     image_name = os.path.splitext(os.path.basename(image_path))[0]
 
@@ -89,7 +90,8 @@ def save_bar_bb_to_image(bbs: List[List[dict]], image_path, save_dir="tab_boxes"
         for bb in row:
             i += 1
             # Extract coordinates
-            x1, y1, x2, y2 = map(int, bb['box'])
+            box = bb.get('box', {})
+            x1, y1, x2, y2 = box.get('x1'), box.get('y1'), box.get('x2'), box.get('y2')
             
             # Crop the image
             cropped_bar = image.crop((x1 - l, y1 - u, x2 + r, y2 + d))
