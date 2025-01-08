@@ -1,4 +1,3 @@
-from itertools import chain
 import os
 from typing import List
 import torch
@@ -79,7 +78,6 @@ def save_bar_bb_to_image(bbs: List[List[dict]], image_path, save_dir="tab_boxes"
     """
     Given the bar bounding boxes of a tablature page, extract them and save them as images.
     """
-    print("IAM CALLED")
     image = Image.open(image_path)
     image_name = os.path.splitext(os.path.basename(image_path))[0]
 

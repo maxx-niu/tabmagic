@@ -10,6 +10,7 @@ from pdf2image import convert_from_path
 import os
 from PIL import Image
 from getTabBboxes import load_model, compute_bounding_boxes, save_bar_bb_to_image, sort_bar_bounding_boxes
+from getNumbers import getNoteBoundingBoxes
 from serverutils import clear_directory
 from lineExtraction import detect_staff_lines
 
@@ -48,7 +49,7 @@ def upload_file():
 
     elif file_extension in ['.png', '.jpg', '.jpeg']:
         print("uploaded file was an image")
-        image_path = os.path.join(IMAGE_FOLDER, filename)
+        image_path = os.path.join(IMAGE_FOLDER, f'{os.path.splitext(file.filename)[0]}_page_1.png')
         file.save(image_path)
         image_paths = [image_path]
 
@@ -67,7 +68,6 @@ def get_tab_box(filename):
     return send_from_directory(os.path.abspath(TAB_BOXES_FOLDER), filename)
 
 @app.route('/process-boxes', methods=['POST'])
-# TODO: get the images from the bounding boxes next. return data to fix flask error
 def process_boxes():
     data = request.get_json().get('data', [])
     for item in data:
@@ -79,6 +79,8 @@ def process_boxes():
         bbs_sorted = sort_bar_bounding_boxes(bounding_boxes)
         print(bbs_sorted)
         save_bar_bb_to_image(bbs_sorted, full_path, u=5, d=5) # save the images of the bars to the tab_boxes dir
+    note_boxes = getNoteBoundingBoxes()
+    return jsonify({'message': 'Bar bounding boxes saved as images.'}), 200
     
 
 @app.route('/process', methods=['POST'])
