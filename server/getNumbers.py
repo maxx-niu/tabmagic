@@ -31,6 +31,6 @@ def getNoteBoundingBoxes():
       "boxes": boxes
     }
     results.append(sub_result)
-    print("Page: ", page_number, "Bar: ", bar_number, "Notes Detected: ", len(boxes))
+  results.sort(key=lambda x: (x["page"], x["bar"]))
   return results
 

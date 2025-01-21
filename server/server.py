@@ -80,7 +80,7 @@ def process_boxes():
         print(bbs_sorted)
         save_bar_bb_to_image(bbs_sorted, full_path, u=5, d=5) # save the images of the bars to the tab_boxes dir
     note_boxes = getNoteBoundingBoxes()
-    return jsonify({'message': 'Bar bounding boxes saved as images.'}), 200
+    return jsonify(note_boxes), 200
     
 
 @app.route('/process', methods=['POST'])
@@ -127,9 +127,9 @@ def predict():
     return jsonify(results)
 
 # mini flask tutorial:
-# @app.route("/members") # setup URL endpoints with the @app.route() decorator
-# def members(): # what the function does for this route
-#     return {"members": ["1", "2", "3", "buckle my shoe"]}
+@app.route("/members") # setup URL endpoints with the @app.route() decorator
+def members(): # what the function does for this route
+    return {"members": ["1", "2", "3", "buckle my shoe"]}
 
 if __name__ == "__main__":
     app.run(debug=True) # debug=True makes it so that errors will popup on the webpage

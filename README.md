@@ -22,10 +22,7 @@ TabMagic's recoginition abilities are powered by PyTorch and a Faster R-CNN obje
 ### Prerequisites
 
 - Node.js
-- Python
-
-### Recommmended
-
+- Python 3.10
 - CUDA enabled GPU
 
 ### Installation
@@ -40,9 +37,9 @@ TabMagic's recoginition abilities are powered by PyTorch and a Faster R-CNN obje
 
 To run and train the model, you'll need to set up a Python environment with the necessary dependencies:
 
-1. Create a virtual environment:
+1. Create a virtual environment, running Python 3.10:
    ```bash
-   python -m venv venv
+   py -3.10 -m venv venv
    ```
 
 2. Activate the virtual environment:

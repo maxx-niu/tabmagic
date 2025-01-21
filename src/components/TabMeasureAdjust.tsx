@@ -11,8 +11,16 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({ tabImages, onUploadAgain }) => 
   const [flashId, setFlashId] = useState<string | null>(null);
   const [availableHeight, setAvailableHeight] = useState(window.innerHeight);
   const [currentPage, setCurrentPage] = useState(0);
+  const [noteBoxes, setNoteBoxes] = useState<any[]>([]);
 
-  const { uploadBoxes, loading, error } = useUploadBoxes();
+  const { uploadBoxes, loading, error, results } = useUploadBoxes();
+
+  useEffect(() => {
+    if (results) {
+      setNoteBoxes(results);
+      console.log(results);
+    }
+  }, [results]);
 
   const handleProcessBars = () => {
     const paths = tabImages.map((image) => image.image_path);
