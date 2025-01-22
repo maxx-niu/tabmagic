@@ -38,11 +38,13 @@ TabMagic's recoginition abilities are powered by PyTorch and a Faster R-CNN obje
 To run and train the model, you'll need to set up a Python environment with the necessary dependencies:
 
 1. Create a virtual environment, running Python 3.10:
+
    ```bash
    py -3.10 -m venv venv
    ```
 
 2. Activate the virtual environment:
+
    - On Windows:
      ```bash
      venv\Scripts\activate
@@ -53,9 +55,12 @@ To run and train the model, you'll need to set up a Python environment with the 
      ```
 
 3. Install the required Python packages:
+
    ```bash
    pip install -r requirements.txt
    ```
+
+4. TabMagic uses a Python Library called pdf2image, which is itself a wrapper for a PDF renderer called Poppler. To setup this part, follow the instructions in [this repo](https://github.com/Belval/pdf2image). Note that you will need to complete this step if you wish to use TabMagic to analyze PDF tablature. Otherwise, continue.
 
 ### Model Training and Usage
 
@@ -64,6 +69,7 @@ To train and use the TabMagic model:
 1. Unzip the data.zip folder, and extract the contents to a `data/` directory in your project folder.
 
 2. Ensure the following structure:
+
    ```
    data/
    ├── features/
@@ -85,7 +91,6 @@ npm run start-dev
 ```
 
 You can now interact with TabMagic on your browser.
-
 
 ## Credits
 

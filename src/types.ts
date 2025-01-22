@@ -15,6 +15,17 @@ export type BoundingBox = {
   y2: number;
 };
 
+// Defines the layout of the note boxes detected on each bar from the SERVER/process-boxes API call
+export type BarNoteResults = {
+  page: number;
+  bar: number;
+  boxes: {
+    box: BoundingBox;
+    score: number;
+    label: string;
+  }[];
+};
+
 export type TabImage = {
   bounding_boxes: Array<
     Array<{
