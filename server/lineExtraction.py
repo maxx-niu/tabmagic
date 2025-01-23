@@ -33,14 +33,14 @@ def detect_staff_lines(image_path, threshold=0.6):
     initial_lines = [row for row in range(len(row_histogram)) if row_histogram[row] >= (width * threshold)]
     
     # Determine staff lines and their thicknesses
-    staff_lines = []
+    staff_lines_positions = []
     staff_lines_thicknesses = []
     cur_thickness = 1
     it = 0
     
     while it < len(initial_lines):
         if cur_thickness == 1:
-            staff_lines.append(initial_lines[it])
+            staff_lines_positions.append(initial_lines[it])
         
         if it == len(initial_lines) - 1:
             staff_lines_thicknesses.append(cur_thickness)
@@ -51,10 +51,15 @@ def detect_staff_lines(image_path, threshold=0.6):
             cur_thickness = 1
         
         it += 1
-    # print(staff_lines)
-    # print(staff_lines_thicknesses)
+     # Define the guitar strings in order
+    guitar_strings = ['e', 'B', 'G', 'D', 'A', 'E']
+    
+    # Create a dictionary mapping guitar strings to staff line positions
+    staff_lines = {guitar_strings[i]: staff_lines_positions[i] for i in range(min(len(guitar_strings), len(staff_lines_positions)))}
+        
     return staff_lines, staff_lines_thicknesses
 
-# # Example usage
-# image_path = 'C:/Users/cakec/Desktop/tabmagic/tab_boxes/Screenshot 2024-07-30 214511_bar_6.png'
+# Example usage
+# image_path = 'C:/Users/cakec/Desktop/tabmagic/tab_boxes/Screenshot 2025-01-22 160012_page_1_bar_10.png'
 # staffLines, thicknesses = detect_staff_lines(image_path)
+# print(staffLines)

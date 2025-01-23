@@ -11,7 +11,7 @@ import os
 from PIL import Image
 from getTabBboxes import load_model, compute_bounding_boxes, save_bar_bb_to_image, sort_bar_bounding_boxes
 from getNumbers import getNoteBoundingBoxes
-from serverutils import clear_directory
+from serverutils import clear_directory, compute_notes
 from lineExtraction import detect_staff_lines
 
 app = Flask(__name__) # this rferences this server.py file
@@ -32,30 +32,14 @@ def upload_file():
     # Clear the image folder before saving new files
     clear_directory(IMAGE_FOLDER)
 
-    if file_extension == '.pdf':
-        
-        file_path = os.path.join(TEMP_UPLOAD_FOLDER, filename)
-        file.save(file_path)
-
-        # Convert PDF to images
-        images = convert_from_path(file_path)
-        image_paths = []
-        for i, image in enumerate(images):
-            image_path = os.path.join(IMAGE_FOLDER, f'{os.path.splitext(file.filename)[0]}_page_{i + 1}.png')
-            image.save(image_path, 'PNG')
-            image_paths.append(image_path)
-        # Clear the temp folder after processing
-        clear_directory(TEMP_UPLOAD_FOLDER)
-
-    elif file_extension in ['.png', '.jpg', '.jpeg']:
-        print("uploaded file was an image")
+    if file_extension in ['.png']:
         image_path = os.path.join(IMAGE_FOLDER, f'{os.path.splitext(file.filename)[0]}_page_1.png')
         file.save(image_path)
         image_paths = [image_path]
 
     else:
         # Unsupported file type
-        return jsonify({'error': 'Unsupported file type. Please upload a PDF or image file.'}), 400
+        return jsonify({'error': 'Unsupported file type. Please upload a PNG image file.'}), 400
 
     return jsonify({'image_paths': image_paths})
 
@@ -80,6 +64,21 @@ def process_boxes():
         print(bbs_sorted)
         save_bar_bb_to_image(bbs_sorted, full_path, u=5, d=5) # save the images of the bars to the tab_boxes dir
     note_boxes = getNoteBoundingBoxes()
+    # get the staff line positions for each bar:
+    string_positions = []
+    for tab_box in os.listdir(TAB_BOXES_FOLDER):
+        full_path = os.path.abspath(os.path.join(TAB_BOXES_FOLDER, tab_box))
+        bar_string_positions, _ = detect_staff_lines(full_path)
+        string_positions.append(bar_string_positions)
+    # print(len(note_boxes))
+    # print(string_positions)
+    for i, bar in enumerate(note_boxes):
+        bar_note_boxes = []
+        for j, bar_note_box in enumerate(bar["boxes"]):
+            bar_note_boxes.append(bar_note_box["box"])
+        print("Bar: ", i)
+        print(len(compute_notes(bar_note_boxes, string_positions[i])))
+
     return jsonify(note_boxes), 200
     
 
@@ -127,9 +126,9 @@ def predict():
     return jsonify(results)
 
 # mini flask tutorial:
-@app.route("/members") # setup URL endpoints with the @app.route() decorator
-def members(): # what the function does for this route
-    return {"members": ["1", "2", "3", "buckle my shoe"]}
+# @app.route("/members") # setup URL endpoints with the @app.route() decorator
+# def members(): # what the function does for this route
+#     return {"members": ["1", "2", "3", "buckle my shoe"]}
 
 if __name__ == "__main__":
     app.run(debug=True) # debug=True makes it so that errors will popup on the webpage
