@@ -12,7 +12,7 @@ import uuid
 
 TAB_BOXES_FOLDER = './tab_boxes'
 
-# gets the bounding boxes of each note in the tab. returns the notes from left->right as they appear in the bar
+# gets the bounding boxes of each note in the entire tab. returns the notes from left->right as they appear in the bar
 def getNoteBoundingBoxes():
   model = load_model('./models/tabmagic_model_bars.pth')
   results = []
