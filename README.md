@@ -9,7 +9,6 @@ TabMagic's recoginition abilities are powered by PyTorch and a Faster R-CNN obje
 - Analyzes uploaded guitar tablature PDFs/PNGs
 - Identifies chord progressions
 - Determines the key of the piece
-- Suggests alternative ways to play
 - Supports standard 6-string guitar tabs
 
 ## How TabMagic Works
