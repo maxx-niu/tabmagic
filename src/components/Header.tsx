@@ -16,16 +16,6 @@ const Header: FC = () => {
                 What is it?
               </Link>
             </li>
-            <li>
-              <Link to="/how-it-works" className="nav-link">
-                How it Works
-              </Link>
-            </li>
-            <li>
-              <Link to="/about" className="nav-link">
-                About the Developer
-              </Link>
-            </li>
           </ul>
         </nav>
       </div>

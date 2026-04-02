@@ -8,8 +8,6 @@ import {
 import UploadComponent from "./components/UploadComponent";
 import Header from "./components/Header";
 import Overview from "./pages/Overview";
-import HowItWorks from "./pages/HowItWorks";
-import AboutTheDev from "./pages/AboutTheDev";
 import TabVisualizer from "./components/visualizers/TabVisualizer";
 import "./styles/App.css";
 
@@ -20,9 +18,7 @@ const AppContent: FC = () => {
   useEffect(() => {
     setShowHeader(
       location.pathname === "/" ||
-        location.pathname === "/overview" ||
-        location.pathname === "/how-it-works" ||
-        location.pathname === "/about"
+        location.pathname === "/overview"
     );
   }, [location.pathname]);
 
@@ -49,8 +45,6 @@ const AppContent: FC = () => {
             }
           />
           <Route path="/overview" element={<Overview />} />
-          <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/about" element={<AboutTheDev />} />
           <Route path="/visualizer" element={<TabVisualizer />} />
         </Routes>
       </div>

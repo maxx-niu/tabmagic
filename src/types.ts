@@ -19,10 +19,12 @@ export type BoundingBox = {
 export type BarNoteResults = {
   page: number;
   bar: number;
+  chord: string;
   boxes: {
     box: BoundingBox;
     score: number;
     label: string;
+    fret: number;
   }[];
 };
 

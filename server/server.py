@@ -13,6 +13,7 @@ from getTabBboxes import load_model, compute_bounding_boxes, save_bar_bb_to_imag
 from getNumbers import getNoteBoundingBoxes
 from serverutils import clear_directory, compute_notes
 from lineExtraction import detect_staff_lines
+from tabAnalysis import fret_to_note, getChords, getKey
 
 app = Flask(__name__) # this rferences this server.py file
 cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}) # makes it so that server accepts all requests
@@ -64,22 +65,49 @@ def process_boxes():
         print(bbs_sorted)
         save_bar_bb_to_image(bbs_sorted, full_path, u=5, d=5) # save the images of the bars to the tab_boxes dir
     note_boxes = getNoteBoundingBoxes()
-    # get the staff line positions for each bar:
+
+    # get the staff line positions for each bar (sorted to match note_boxes order)
+    tab_box_files = sorted(os.listdir(TAB_BOXES_FOLDER))
     string_positions = []
-    for tab_box in os.listdir(TAB_BOXES_FOLDER):
+    for tab_box in tab_box_files:
         full_path = os.path.abspath(os.path.join(TAB_BOXES_FOLDER, tab_box))
         bar_string_positions, _ = detect_staff_lines(full_path)
         string_positions.append(bar_string_positions)
-    # print(len(note_boxes))
-    # print(string_positions)
-    for i, bar in enumerate(note_boxes):
-        bar_note_boxes = []
-        for j, bar_note_box in enumerate(bar["boxes"]):
-            bar_note_boxes.append(bar_note_box["box"])
-        print("Bar: ", i)
-        print(len(compute_notes(bar_note_boxes, string_positions[i])))
 
-    return jsonify(note_boxes), 200
+    all_notes = []
+    bars_for_chords = []
+
+    for i, bar in enumerate(note_boxes):
+        bar_note_boxes = [item["box"] for item in bar["boxes"]]
+        simultaneous_groups = compute_notes(bar_note_boxes, string_positions[i])
+
+        # convert (string, fret) -> note name for each note in each group
+        bar_note_groups = []
+        for group in simultaneous_groups:
+            group_notes = []
+            for note_box in group:
+                string = note_box.get("string")
+                fret = next(
+                    (item["fret"] for item in bar["boxes"] if item["box"]["id"] == note_box["id"]),
+                    None
+                )
+                if string is not None and fret is not None:
+                    note_name = fret_to_note(string, fret)
+                    note_box["note"] = note_name
+                    group_notes.append(note_name)
+                    all_notes.append(note_name)
+            bar_note_groups.append(group_notes)
+
+        bars_for_chords.append(bar_note_groups)
+        bar["chord"] = ""  # filled in below
+
+    chords = getChords(bars_for_chords)
+    for i, bar in enumerate(note_boxes):
+        bar["chord"] = chords[i]
+
+    key = getKey(all_notes)
+
+    return jsonify({"bars": note_boxes, "key": key}), 200
     
 
 @app.route('/process', methods=['POST'])

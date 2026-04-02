@@ -4,6 +4,7 @@ import { BarNoteResults } from "../../types";
 
 interface BarData {
   bar: number;
+  chord: string;
   imageSrc: string;
   boxes: BarNoteResults["boxes"];
 }
@@ -19,7 +20,7 @@ const TabPageVisualizer: FC<TabPageVisualizerProps> = ({ page, bars }) => {
       <p>Page: {page}</p>
       {bars.map((barData) => (
         <div key={barData.bar} style={{ marginBottom: "20px" }}>
-          <p>Bar {barData.bar}</p>
+          <p>Bar {barData.bar}{barData.chord && barData.chord !== "unknown" ? ` — ${barData.chord}` : ""}</p>
           <TabBarVisualizer imageSrc={barData.imageSrc} boxes={barData.boxes} />
         </div>
       ))}

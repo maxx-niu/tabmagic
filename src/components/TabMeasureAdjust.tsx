@@ -15,17 +15,17 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({
   const [flashId, setFlashId] = useState<string | null>(null);
   const [availableHeight, setAvailableHeight] = useState(window.innerHeight);
   const [currentPage, setCurrentPage] = useState(0);
-  const [noteBoxes, setNoteBoxes] = useState<any[]>([]);
   const navigate = useNavigate();
 
-  const { uploadBoxes, loading, error, results } = useUploadBoxes();
+  const { uploadBoxes, results } = useUploadBoxes();
 
   useEffect(() => {
     if (results) {
-      setNoteBoxes(results);
-      navigate("/visualizer", { state: { noteResults: results, tabImages } });
+      navigate("/visualizer", {
+        state: { noteResults: results.bars, key: results.key, tabImages },
+      });
     }
-  }, [results, navigate]);
+  }, [results, navigate, tabImages]);
 
   const handleProcessBars = () => {
     const paths = tabImages.map((image) => image.image_path);
@@ -35,8 +35,8 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({
   const deleteBox = (id: string, pageIndex: number) => {
     setBoundingBoxes((prevBoxes) =>
       prevBoxes.map((boxes, idx) =>
-        idx === pageIndex ? boxes.filter((box) => box.id !== id) : boxes
-      )
+        idx === pageIndex ? boxes.filter((box) => box.id !== id) : boxes,
+      ),
     );
   };
 
@@ -55,8 +55,8 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({
                 y2: newBox[3],
               },
             ]
-          : box
-      )
+          : box,
+      ),
     );
     setFlashId(newId);
     setTimeout(() => setFlashId(null), 500);
@@ -65,7 +65,7 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({
   const updateBox = (
     updatedBox: number[],
     boxId: string,
-    pageIndex: number
+    pageIndex: number,
   ) => {
     const [x1, y1, x2, y2] = updatedBox;
 
@@ -73,10 +73,10 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({
       prevBoxes.map((boxes, idx) =>
         idx === pageIndex
           ? boxes.map((box) =>
-              box.id === boxId ? { ...box, x1, y1, x2, y2 } : box
+              box.id === boxId ? { ...box, x1, y1, x2, y2 } : box,
             )
-          : boxes
-      )
+          : boxes,
+      ),
     );
   };
 
@@ -99,7 +99,7 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({
         y1: bb.box.y1,
         x2: bb.box.x2,
         y2: bb.box.y2,
-      }))
+      })),
     );
     setBoundingBoxes(extractedBoundingBoxes);
     console.log(extractedBoundingBoxes);
@@ -120,7 +120,7 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({
   const maxHeight = availableHeight * 0.8;
   const scaleFactor = Math.min(
     1,
-    maxHeight / tabImages[currentPage].image_height
+    maxHeight / tabImages[currentPage].image_height,
   );
   console.log(scaleFactor);
 
@@ -161,7 +161,7 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({
                     tabImages[currentPage].image_width,
                     200,
                   ],
-                  currentPage
+                  currentPage,
                 )
               }
             >
@@ -169,7 +169,7 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({
             </button>
             {boundingBoxes[currentPage]?.map((bb) => {
               const scaledBox = [bb.x1, bb.y1, bb.x2, bb.y2].map(
-                (value) => value * scaleFactor
+                (value) => value * scaleFactor,
               );
               return (
                 <BarBoundingBox

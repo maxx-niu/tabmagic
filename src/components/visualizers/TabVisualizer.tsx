@@ -5,6 +5,7 @@ import TabPageVisualizer from "./TabPageVisualizer";
 
 interface BarData {
   bar: number;
+  chord: string;
   imageSrc: string;
   boxes: BarNoteResults["boxes"];
 }
@@ -17,10 +18,12 @@ const TabVisualizer: FC = () => {
   const location = useLocation();
   const [pageResults, setPageResults] = useState<PageResult[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const [key, setKey] = useState<string>("");
 
   useEffect(() => {
     const noteResults = (location.state?.noteResults || []) as BarNoteResults[];
     const tabImages = (location.state?.tabImages || []) as TabImage[];
+    setKey(location.state?.key || "");
 
     const getBarImageSrc = (page: number, bar: number): string => {
       const tabImage = tabImages[page - 1];
@@ -31,11 +34,11 @@ const TabVisualizer: FC = () => {
 
     const pagesMap: { [key: number]: PageResult } = {};
     noteResults.forEach((result) => {
-      const { page, bar, boxes } = result;
+      const { page, bar, chord, boxes } = result;
       if (!pagesMap[page]) {
         pagesMap[page] = { bars: [] };
       }
-      pagesMap[page].bars.push({ bar, imageSrc: getBarImageSrc(page, bar), boxes });
+      pagesMap[page].bars.push({ bar, chord, imageSrc: getBarImageSrc(page, bar), boxes });
     });
     setPageResults(Object.values(pagesMap));
   }, [location.state]);
@@ -50,6 +53,7 @@ const TabVisualizer: FC = () => {
 
   return (
     <div className="tab-visualizer-container">
+      {key && <h3>Key: {key}</h3>}
       {pageResults.length > 0 && (
         <TabPageVisualizer
           page={currentPage + 1}
