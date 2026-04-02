@@ -101,23 +101,22 @@ unzip data.zip -d .
    └── labels/
    ```
 
-3. Run the notebook `model.ipynb` to train the model. The training may take some time, depending on your system and whether or not you have a CUDA enabled GPU.
+3. Run both training notebooks. The training may take some time, depending on your system and whether or not you have a CUDA enabled GPU.
 
 ```bash
 pip install jupyter
-jupyter notebook model.ipynb
+jupyter notebook model.ipynb        # trains bar detection model
+jupyter notebook model_bars.ipynb   # trains fret number detection model
 ```
 
-Then run all cells top to bottom `(Cell → Run All).`
+Then run all cells top to bottom in each notebook `(Cell → Run All).`
 
-4. After training, move the model to the `server/models/` directory:
+4. After training, both models will be saved in the `models/` directory:
 
-```bash
-mkdir -p server/models
-mv models/tabmagic_model.pth server/models/tabmagic_model.pth
-```
+   - `models/tabmagic_model.pth` — detects bars in a full tab image
+   - `models/tabmagic_model_bars.pth` — detects fret numbers within each bar
 
-5. The Flask server (`server.py`) will automatically load this model when processing requests.
+5. The Flask server (`server.py`) will automatically load these models when processing requests.
 
 ### Running the Application
 

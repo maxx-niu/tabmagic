@@ -131,7 +131,7 @@ def predict():
 #     return {"members": ["1", "2", "3", "buckle my shoe"]}
 
 if __name__ == "__main__":
-    app.run(debug=True) # debug=True makes it so that errors will popup on the webpage
+    app.run(host='0.0.0.0', debug=True) # debug=True makes it so that errors will popup on the webpage
 
 # Steps cont'd:
 # 5. execute the server code (python server.py)
