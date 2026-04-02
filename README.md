@@ -22,7 +22,7 @@ TabMagic's recoginition abilities are powered by PyTorch and a Faster R-CNN obje
 
 - Node.js
 - Python 3.10
-- CUDA enabled GPU
+- CUDA enabled GPU (highly recommended)
 
 ### Installation
 
@@ -42,6 +42,12 @@ To run and train the model, you'll need to set up a Python environment with the 
    py -3.10 -m venv venv
    ```
 
+   or if you're on a Mac:
+
+   ```bash
+   python3.10 -m venv venv
+   ```
+
 2. Activate the virtual environment:
 
    - On Windows:
@@ -55,17 +61,37 @@ To run and train the model, you'll need to set up a Python environment with the 
 
 3. Install the required Python packages:
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+   - On Windows:
+     ```bash
+     pip install -r requirements.txt
+     ```
+   - On macOS and Linux:
+     ```bash
+      pip install flask flask-cors pillow opencv-python numpy pandas matplotlib scikit-learn
+      pip install torch torchvision  # CPU version (macOS doesn't support CUDA)
+      pip install pdf2image
+     ```
 
 4. TabMagic uses a Python Library called pdf2image, which is itself a wrapper for a PDF renderer called Poppler. To setup this part, follow the instructions in [this repo](https://github.com/Belval/pdf2image). Note that you will need to complete this step if you wish to use TabMagic to analyze PDF tablature. Otherwise, continue.
 
-### Model Training and Usage
+### Model Setup
 
-To train and use the TabMagic model:
+#### Option 1: Use the pre-trained model (recommended)
+
+Download the pre-trained model from the [latest release](https://github.com/maxx-niu/tabmagic/releases/latest) and place it in the `server/models/` directory:
+
+```bash
+mkdir -p server/models
+curl -L https://github.com/maxx-niu/tabmagic/releases/download/v1.0.0/tabmagic_model.pth -o server/models/tabmagic_model.pth
+```
+
+#### Option 2: Train the model yourself
 
 1. Unzip the data.zip folder, and extract the contents to a `data/` directory in your project folder.
+
+```bash
+unzip data.zip -d .
+```
 
 2. Ensure the following structure:
 
@@ -77,7 +103,19 @@ To train and use the TabMagic model:
 
 3. Run the notebook `model.ipynb` to train the model. The training may take some time, depending on your system and whether or not you have a CUDA enabled GPU.
 
-4. After training, the model will be saved in the `models` directory as `tabmagic_model.pth`.
+```bash
+pip install jupyter
+jupyter notebook model.ipynb
+```
+
+Then run all cells top to bottom `(Cell → Run All).`
+
+4. After training, move the model to the `server/models/` directory:
+
+```bash
+mkdir -p server/models
+mv models/tabmagic_model.pth server/models/tabmagic_model.pth
+```
 
 5. The Flask server (`server.py`) will automatically load this model when processing requests.
 
