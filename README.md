@@ -78,11 +78,12 @@ To run and train the model, you'll need to set up a Python environment with the 
 
 #### Option 1: Use the pre-trained model (recommended)
 
-Download the pre-trained model from the [latest release](https://github.com/maxx-niu/tabmagic/releases/latest) and place it in the `server/models/` directory:
+Download the pre-trained models from the [latest release](https://github.com/maxx-niu/tabmagic/releases/latest) and place them in the `models/` directory:
 
 ```bash
-mkdir -p server/models
-curl -L https://github.com/maxx-niu/tabmagic/releases/download/v1.0.0/tabmagic_model.pth -o server/models/tabmagic_model.pth
+mkdir -p models
+curl -L https://github.com/maxx-niu/tabmagic/releases/download/v1.1.0/tabmagic_model.pth -o models/tabmagic_model.pth
+curl -L https://github.com/maxx-niu/tabmagic/releases/download/v1.1.0/tabmagic_model_bars.pth -o models/tabmagic_model_bars.pth
 ```
 
 #### Option 2: Train the model yourself
