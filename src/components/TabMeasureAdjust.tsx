@@ -23,7 +23,7 @@ const TabMeasureAdjust: FC<TabDisplayProps> = ({
   useEffect(() => {
     if (results) {
       setNoteBoxes(results);
-      navigate("/visualizer", { state: { noteResults: results } });
+      navigate("/visualizer", { state: { noteResults: results, tabImages } });
     }
   }, [results, navigate]);
 

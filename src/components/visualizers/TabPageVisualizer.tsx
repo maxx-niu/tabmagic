@@ -1,36 +1,29 @@
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import TabBarVisualizer from "./TabBarVisualizer";
+import { BarNoteResults } from "../../types";
+
+interface BarData {
+  bar: number;
+  imageSrc: string;
+  boxes: BarNoteResults["boxes"];
+}
 
 interface TabPageVisualizerProps {
   page: number;
-  bars: number;
-  // boxes: {
-  //   box: {
-  //     id: string;
-  //     x1: number;
-  //     y1: number;
-  //     x2: number;
-  //     y2: number;
-  //   };
-  //   score: number;
-  //   label: string;
-  // }[];
+  bars: BarData[];
 }
 
 const TabPageVisualizer: FC<TabPageVisualizerProps> = ({ page, bars }) => {
   return (
-    <>
-      <div className="tab-page-visualizer-container">
-        I am a tab Page Visualizer
-        <p>Page: {page}</p>
-        <p>Total Bars: {bars}</p>
-        {Array.from({ length: bars }, (_, index) => (
-          <div key={index}>
-            <TabBarVisualizer notes={[]} />
-          </div>
-        ))}
-      </div>
-    </>
+    <div className="tab-page-visualizer-container">
+      <p>Page: {page}</p>
+      {bars.map((barData) => (
+        <div key={barData.bar} style={{ marginBottom: "20px" }}>
+          <p>Bar {barData.bar}</p>
+          <TabBarVisualizer imageSrc={barData.imageSrc} boxes={barData.boxes} />
+        </div>
+      ))}
+    </div>
   );
 };
 

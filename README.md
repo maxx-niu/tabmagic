@@ -82,8 +82,9 @@ Download the pre-trained models from the [latest release](https://github.com/max
 
 ```bash
 mkdir -p models
-curl -L https://github.com/maxx-niu/tabmagic/releases/download/v1.1.0/tabmagic_model.pth -o models/tabmagic_model.pth
-curl -L https://github.com/maxx-niu/tabmagic/releases/download/v1.1.0/tabmagic_model_bars.pth -o models/tabmagic_model_bars.pth
+curl -L https://github.com/maxx-niu/tabmagic/releases/download/v1.2.0/tabmagic_model.pth -o models/tabmagic_model.pth
+curl -L https://github.com/maxx-niu/tabmagic/releases/download/v1.2.0/tabmagic_model_bars.pth -o models/tabmagic_model_bars.pth
+curl -L https://github.com/maxx-niu/tabmagic/releases/download/v1.2.0/number_model.pth -o models/number_model.pth
 ```
 
 #### Option 2: Train the model yourself
@@ -102,20 +103,22 @@ unzip data.zip -d .
    └── labels/
    ```
 
-3. Run both training notebooks. The training may take some time, depending on your system and whether or not you have a CUDA enabled GPU.
+3. Run all three training notebooks. The training may take some time, depending on your system and whether or not you have a CUDA enabled GPU.
 
 ```bash
 pip install jupyter
-jupyter notebook model.ipynb        # trains bar detection model
-jupyter notebook model_bars.ipynb   # trains fret number detection model
+jupyter notebook model.ipynb         # trains bar detection model
+jupyter notebook model_bars.ipynb    # trains fret number bounding box detection model
+jupyter notebook model_numbers.ipynb # trains fret number classifier model
 ```
 
 Then run all cells top to bottom in each notebook `(Cell → Run All).`
 
-4. After training, both models will be saved in the `models/` directory:
+4. After training, all three models will be saved in the `models/` directory:
 
    - `models/tabmagic_model.pth` — detects bars in a full tab image
-   - `models/tabmagic_model_bars.pth` — detects fret numbers within each bar
+   - `models/tabmagic_model_bars.pth` — detects fret number locations within each bar
+   - `models/number_model.pth` — classifies the digit value of each detected fret number
 
 5. The Flask server (`server.py`) will automatically load these models when processing requests.
 
